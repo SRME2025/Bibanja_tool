@@ -3,985 +3,174 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Uganda Land Use Data Collection System</title>
+    <title>Kampala Land Use Data Collection System</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* ==================== COMPLETE STYLES - PRESERVED ==================== */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f9fc;
-            color: #333;
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 20px;
-        }
-        
-        header {
-            background: linear-gradient(135deg, #FFD700 0%, #000000 100%);
-            color: white;
-            padding: 20px 0;
-            text-align: center;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 25px;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 0 20px;
-        }
-        
-        .header-title h1 {
-            font-size: 2.2rem;
-            margin-bottom: 5px;
-        }
-        
-        .header-title .subtitle {
-            font-size: 1rem;
-            opacity: 0.9;
-        }
-        
-        .status-indicator {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 20px;
-            margin-top: 10px;
-        }
-        
-        .online-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background-color: #28a745;
-            animation: pulse 2s infinite;
-        }
-        
-        .status-dot.offline {
-            background-color: #dc3545;
-            animation: none;
-        }
-        
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
-        
-        .gps-status {
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .gps-active {
-            color: #28a745;
-        }
-        
-        .gps-inactive {
-            color: #dc3545;
-        }
-        
-        .user-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-info {
-            text-align: right;
-        }
-        
-        .user-name {
-            font-weight: bold;
-        }
-        
-        .user-role {
-            font-size: 0.9rem;
-            opacity: 0.8;
-        }
-        
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            background: #FFD700;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            color: #000;
-        }
-        
-        .dashboard-tabs {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 20px;
-            background: white;
-            padding: 10px;
-            border-radius: 10px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-        }
-        
-        .tab-btn {
-            padding: 12px 24px;
-            background: #f8f9fa;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .tab-btn.active {
-            background: #FFD700;
-            color: #000;
-        }
-        
-        .main-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 25px;
-            margin-bottom: 30px;
-        }
-        
-        .map-container {
-            flex: 2;
-            min-width: 500px;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
-        
-        .data-container {
-            flex: 1;
-            min-width: 350px;
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            display: flex;
-            flex-direction: column;
-        }
-        
-        h2 {
-            color: #000000;
-            margin-bottom: 20px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid #FFD700;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        h2 i {
-            color: #FFD700;
-        }
-        
-        /* ==================== MAP STYLES ==================== */
-        #map, #adminMap {
-            height: 550px;
-            width: 100%;
-            border-radius: 8px;
-            border: 1px solid #ddd;
-            z-index: 1;
-        }
-        
-        .map-mode-selector {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .mode-btn {
-            padding: 10px 15px;
-            background: #f8f9fa;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            font-weight: 600;
-            flex: 1;
-            text-align: center;
-            transition: all 0.3s;
-        }
-        
-        .mode-btn.active {
-            background: #FFD700;
-            border-color: #FFD700;
-            color: #000;
-        }
-        
-        .mode-instruction {
-            background: #e7f3ff;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 10px;
-            text-align: center;
-            font-size: 14px;
-            color: #0056b3;
-        }
-        
-        .layer-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        
-        .layer-btn {
-            padding: 8px 12px;
-            background: #f8f9fa;
-            border: 2px solid #ddd;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-size: 13px;
-        }
-        
-        .layer-btn.active {
-            border-color: #FFD700;
-            background: #fff8e1;
-        }
-        
-        .location-tracker {
-            background: #e8f5e8;
-            padding: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .location-info {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
-        
-        .location-coords {
-            font-family: monospace;
-            font-size: 14px;
-        }
-        
-        .location-accuracy {
-            font-size: 12px;
-            color: #666;
-        }
-        
-        .tracking-btn {
-            padding: 8px 15px;
-            background: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .tracking-btn.active {
-            background: #dc3545;
-        }
-        
-        .area-info {
-            background-color: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            display: none;
-        }
-        
-        .area-info.active {
-            display: block;
-        }
-        
-        .area-details {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .detail-item {
-            background: white;
-            padding: 10px;
-            border-radius: 5px;
-            border-left: 4px solid #FFD700;
-        }
-        
-        .detail-label {
-            font-weight: bold;
-            font-size: 0.9rem;
-            color: #666;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .detail-value {
-            font-size: 1.1rem;
-            color: #000;
-            word-break: break-all;
-        }
-        
-        .map-legend {
-            position: absolute;
-            bottom: 30px;
-            right: 30px;
-            z-index: 1000;
-            background: white;
-            padding: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-            max-width: 250px;
-        }
-        
-        .measurement-controls {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 5px;
-        }
-        
-        .unit-selector {
-            display: flex;
-            gap: 5px;
-            align-items: center;
-        }
-        
-        .unit-btn {
-            padding: 5px 10px;
-            border: 1px solid #ddd;
-            background: white;
-            border-radius: 3px;
-            cursor: pointer;
-            font-size: 12px;
-        }
-        
-        .unit-btn.active {
-            background: #FFD700;
-            border-color: #FFD700;
-        }
-        
-        /* ==================== FORM STYLES ==================== */
-        .data-form {
-            margin-top: 20px;
-            flex-grow: 1;
-            display: flex;
-            flex-direction: column;
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 8px;
-            font-weight: 600;
-            color: #444;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .required::after {
-            content: " *";
-            color: #dc3545;
-        }
-        
-        input, select, textarea {
-            width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-            transition: border 0.3s;
-        }
-        
-        input:focus, select:focus, textarea:focus {
-            border-color: #FFD700;
-            outline: none;
-            box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.2);
-        }
-        
-        textarea {
-            min-height: 100px;
-            resize: vertical;
-        }
-        
-        .form-row {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .form-row .form-group {
-            flex: 1;
-        }
-        
-        .form-actions {
-            display: flex;
-            gap: 15px;
-            margin-top: auto;
-        }
-        
-        .btn {
-            padding: 14px 24px;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 16px;
-            font-weight: 600;
-            transition: all 0.3s;
-            flex: 1;
-            text-align: center;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .btn-primary {
-            background-color: #000000;
-            color: white;
-        }
-        
-        .btn-primary:hover {
-            background-color: #333;
-        }
-        
-        .btn-primary:disabled {
-            background-color: #cccccc;
-            cursor: not-allowed;
-        }
-        
-        .btn-secondary {
-            background-color: #FFD700;
-            color: #000;
-        }
-        
-        .btn-secondary:hover {
-            background-color: #e6c200;
-        }
-        
-        .toggle-section {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            margin-bottom: 15px;
-            padding: 15px;
-            background: #f8f9fa;
-            border-radius: 8px;
-        }
-        
-        .toggle-switch {
-            position: relative;
-            display: inline-block;
-            width: 60px;
-            height: 30px;
-        }
-        
-        .toggle-switch input {
-            opacity: 0;
-            width: 0;
-            height: 0;
-        }
-        
-        .toggle-slider {
-            position: absolute;
-            cursor: pointer;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #ccc;
-            transition: .4s;
-            border-radius: 34px;
-        }
-        
-        .toggle-slider:before {
-            position: absolute;
-            content: "";
-            height: 22px;
-            width: 22px;
-            left: 4px;
-            bottom: 4px;
-            background-color: white;
-            transition: .4s;
-            border-radius: 50%;
-        }
-        
-        input:checked + .toggle-slider {
-            background-color: #FFD700;
-        }
-        
-        input:checked + .toggle-slider:before {
-            transform: translateX(30px);
-        }
-        
-        .kibanja-section {
-            background: #e3f2fd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border-left: 4px solid #17a2b8;
-            display: none;
-        }
-        
-        .certificate-section {
-            background: #d4edda;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border-left: 4px solid #28a745;
-            display: none;
-        }
-        
-        .landlord-section {
-            background: #fff3cd;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 10px;
-            border-left: 4px solid #ffc107;
-            display: none;
-        }
-        
-        .income-section {
-            background: #d1ecf1;
-            padding: 20px;
-            border-radius: 8px;
-            margin-top: 15px;
-            margin-bottom: 15px;
-            border-left: 6px solid #17a2b8;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-        }
-        
-        .income-section h3 {
-            color: #0c5460;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            border-bottom: 1px solid #9ec5cb;
-            padding-bottom: 10px;
-        }
-        
-        .currency-input {
-            position: relative;
-        }
-        
-        .currency-symbol {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            font-weight: bold;
-            color: #0c5460;
-            background: #bee5eb;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        
-        .currency-input input {
-            padding-left: 70px;
-            background: white;
-            border: 1px solid #9ec5cb;
-        }
-        
-        .income-total-box {
-            background: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-top: 10px;
-            border: 1px dashed #17a2b8;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        
-        .income-total-value {
-            font-size: 1.2rem;
-            font-weight: bold;
-            color: #17a2b8;
-        }
-        
-        .photo-upload-section {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 8px;
-            margin-top: 15px;
-            border-left: 4px solid #007bff;
-        }
-        
-        .photo-preview-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-            margin-bottom: 15px;
-        }
-        
-        .photo-preview {
-            position: relative;
-            width: 100px;
-            height: 100px;
-            border-radius: 5px;
-            overflow: hidden;
-            border: 2px solid #ddd;
-        }
-        
-        .photo-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .remove-photo {
-            position: absolute;
-            top: 5px;
-            right: 5px;
-            background: rgba(220, 53, 69, 0.8);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        
-        .upload-area {
-            border: 2px dashed #007bff;
-            border-radius: 8px;
-            padding: 30px 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.3s;
-            background: #f0f8ff;
-        }
-        
-        .upload-area:hover {
-            background: #e7f3ff;
-            border-color: #0056b3;
-        }
-        
-        .upload-btn {
-            margin-top: 10px;
-            padding: 10px 20px;
-            background: #007bff;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .status-badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 12px;
-            font-weight: bold;
-        }
-        
-        .status-pending {
-            background: #fff3cd;
-            color: #856404;
-        }
-        
-        .status-approved {
-            background: #d4edda;
-            color: #155724;
-        }
-        
-        .status-rejected {
-            background: #f8d7da;
-            color: #721c24;
-        }
-        
-        .data-display {
-            background: white;
-            border-radius: 10px;
-            padding: 25px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-top: 20px;
-        }
-        
-        .data-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .data-controls {
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-        }
-        
-        .search-box {
-            position: relative;
-        }
-        
-        .search-box input {
-            padding: 10px 15px 10px 40px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            width: 250px;
-            font-size: 14px;
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #666;
-        }
-        
-        .filter-box select {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 14px;
-            min-width: 150px;
-        }
-        
-        .export-buttons {
-            display: flex;
-            gap: 10px;
-        }
-        
-        .btn-export {
-            padding: 10px 20px;
-            background-color: #28a745;
-            color: white;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            font-size: 14px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .btn-export:hover {
-            background-color: #218838;
-        }
-        
-        .btn-print {
-            background-color: #17a2b8;
-        }
-        
-        #dataTable, #adminTable {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 15px;
-        }
-        
-        #dataTable th, #dataTable td, #adminTable th, #adminTable td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
-        }
-        
-        #dataTable th, #adminTable th {
-            background-color: #f2f2f2;
-            color: #000000;
-            position: sticky;
-            top: 0;
-        }
-        
-        #dataTable tr:hover, #adminTable tr:hover {
-            background-color: #f1f1f1;
-        }
-        
-        .action-btn {
-            padding: 6px 12px;
-            margin: 2px;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
-            font-size: 14px;
-            display: inline-flex;
-            align-items: center;
-            gap: 5px;
-        }
-        
-        .view-btn {
-            background-color: #007bff;
-            color: white;
-        }
-        
-        .approve-btn {
-            background-color: #28a745;
-            color: white;
-        }
-        
-        .reject-btn {
-            background-color: #dc3545;
-            color: white;
-        }
-        
-        .admin-map-container {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-        }
-        
-        .admin-controls {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-            margin-bottom: 20px;
-        }
-        
-        .review-actions {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .validation-error {
-            color: #dc3545;
-            font-size: 0.875rem;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .validation-error.show {
-            display: block;
-        }
-        
-        .modal {
-            display: none;
-            position: fixed;
-            z-index: 1001;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
-        }
-        
-        .modal-content {
-            background-color: white;
-            margin: 5% auto;
-            padding: 30px;
-            border-radius: 10px;
-            width: 80%;
-            max-width: 800px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            position: relative;
-            max-height: 80vh;
-            overflow-y: auto;
-        }
-        
-        .close-modal {
-            position: absolute;
-            right: 20px;
-            top: 20px;
-            font-size: 28px;
-            cursor: pointer;
-            color: #666;
-        }
-        
-        .close-modal:hover {
-            color: #000;
-        }
-        
-        .instruction {
-            background-color: #e7f3ff;
-            padding: 15px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-            border-left: 5px solid #007bff;
-        }
-        
-        .offline-notice {
-            background: #fff3cd;
-            border: 1px solid #ffeaa7;
-            color: #856404;
-            padding: 10px;
-            border-radius: 5px;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            display: none;
-        }
-        
-        .offline-notice.active {
-            display: flex;
-        }
-        
-        .no-data {
-            text-align: center;
-            padding: 40px 20px;
-            color: #777;
-            font-style: italic;
-        }
-        
-        footer {
-            text-align: center;
-            margin-top: 40px;
-            padding: 20px;
-            color: #666;
-            font-size: 0.9rem;
-            border-top: 1px solid #eee;
-        }
+        /* ===== All styles (unchanged) ===== */
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        body { background-color: #f5f9fc; color: #333; line-height: 1.6; overflow-x: hidden; }
+        .container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+        header { background: linear-gradient(135deg, #FFD700 0%, #000000 100%); color: white; padding: 20px 0; text-align: center; box-shadow: 0 4px 12px rgba(0,0,0,0.1); margin-bottom: 25px; }
+        .header-content { display: flex; justify-content: space-between; align-items: center; max-width: 1400px; margin: 0 auto; padding: 0 20px; }
+        .header-title h1 { font-size: 2.2rem; margin-bottom: 5px; }
+        .header-title .subtitle { font-size: 1rem; opacity: 0.9; }
+        .status-indicator { display: flex; align-items: center; gap: 15px; background: rgba(255,255,255,0.1); padding: 8px 15px; border-radius: 20px; margin-top: 10px; }
+        .online-status { display: flex; align-items: center; gap: 5px; }
+        .status-dot { width: 10px; height: 10px; border-radius: 50%; background-color: #28a745; animation: pulse 2s infinite; }
+        .status-dot.offline { background-color: #dc3545; animation: none; }
+        @keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+        .gps-status { display: flex; align-items: center; gap: 5px; }
+        .gps-active { color: #28a745; }
+        .gps-inactive { color: #dc3545; }
+        .user-section { display: flex; align-items: center; gap: 15px; }
+        .user-info { text-align: right; }
+        .user-name { font-weight: bold; }
+        .user-role { font-size: 0.9rem; opacity: 0.8; }
+        .user-avatar { width: 50px; height: 50px; background: #FFD700; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; color: #000; }
+        .dashboard-tabs { display: flex; gap: 10px; margin-bottom: 20px; background: white; padding: 10px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+        .tab-btn { padding: 12px 24px; background: #f8f9fa; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; flex: 1; text-align: center; transition: all 0.3s; }
+        .tab-btn.active { background: #FFD700; color: #000; }
+        .main-container { display: flex; flex-wrap: wrap; gap: 25px; margin-bottom: 30px; }
+        .map-container { flex: 2; min-width: 500px; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+        .data-container { flex: 1; min-width: 350px; background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); display: flex; flex-direction: column; }
+        h2 { color: #000000; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid #FFD700; display: flex; align-items: center; gap: 10px; }
+        h2 i { color: #FFD700; }
+        #map, #adminMap { height: 550px; width: 100%; border-radius: 8px; border: 1px solid #ddd; z-index: 1; }
+        .map-mode-selector { display: flex; gap: 10px; margin-bottom: 15px; }
+        .mode-btn { padding: 10px 15px; background: #f8f9fa; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; font-weight: 600; flex: 1; text-align: center; transition: all 0.3s; }
+        .mode-btn.active { background: #FFD700; border-color: #FFD700; color: #000; }
+        .mode-instruction { background: #e7f3ff; padding: 10px; border-radius: 5px; margin-bottom: 10px; text-align: center; font-size: 14px; color: #0056b3; }
+        .layer-controls { display: flex; gap: 10px; margin-bottom: 10px; }
+        .layer-btn { padding: 8px 12px; background: #f8f9fa; border: 2px solid #ddd; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; font-size: 13px; }
+        .layer-btn.active { border-color: #FFD700; background: #fff8e1; }
+        .location-tracker { background: #e8f5e8; padding: 10px; border-radius: 5px; margin-top: 15px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .location-info { display: flex; flex-direction: column; gap: 5px; }
+        .location-coords { font-family: monospace; font-size: 14px; }
+        .location-accuracy { font-size: 12px; color: #666; }
+        .tracking-btn { padding: 8px 15px; background: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; display: flex; align-items: center; gap: 5px; }
+        .tracking-btn.active { background: #dc3545; }
+        .area-info { background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 15px; display: none; }
+        .area-info.active { display: block; }
+        .area-info h3 { color: #000000; margin-bottom: 10px; font-size: 1.2rem; display: flex; align-items: center; gap: 10px; }
+        .area-details { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 15px; }
+        .detail-item { background: white; padding: 10px; border-radius: 5px; border-left: 4px solid #FFD700; }
+        .detail-label { font-weight: bold; font-size: 0.9rem; color: #666; display: flex; align-items: center; gap: 5px; }
+        .detail-value { font-size: 1.1rem; color: #000; word-break: break-all; }
+        .data-form { margin-top: 20px; flex-grow: 1; display: flex; flex-direction: column; }
+        .form-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; color: #444; display: flex; align-items: center; gap: 5px; }
+        .required::after { content: " *"; color: #dc3545; }
+        input, select, textarea { width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 5px; font-size: 16px; transition: border 0.3s; }
+        input:focus, select:focus, textarea:focus { border-color: #FFD700; outline: none; box-shadow: 0 0 0 3px rgba(255,215,0,0.2); }
+        textarea { min-height: 80px; resize: vertical; }
+        .form-row { display: flex; gap: 15px; }
+        .form-row .form-group { flex: 1; }
+        .form-actions { display: flex; gap: 15px; margin-top: auto; }
+        .btn { padding: 14px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: 600; transition: all 0.3s; flex: 1; text-align: center; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: #000000; color: white; }
+        .btn-primary:hover { background-color: #333; }
+        .btn-primary:disabled { background-color: #cccccc; cursor: not-allowed; }
+        .btn-secondary { background-color: #FFD700; color: #000; }
+        .btn-secondary:hover { background-color: #e6c200; }
+        .data-display { background: white; border-radius: 10px; padding: 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-top: 20px; }
+        .data-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        .data-controls { display: flex; gap: 15px; flex-wrap: wrap; }
+        .search-box { position: relative; }
+        .search-box input { padding: 10px 15px 10px 40px; border: 1px solid #ddd; border-radius: 5px; width: 250px; font-size: 14px; }
+        .search-box i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #666; }
+        .filter-box { display: flex; gap: 10px; align-items: center; }
+        .filter-box select { padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; min-width: 150px; }
+        .export-buttons { display: flex; gap: 10px; }
+        .btn-export { padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .btn-export:hover { background-color: #218838; }
+        .btn-print { background-color: #17a2b8; }
+        .btn-print:hover { background-color: #138496; }
+        #dataTable, #adminTable { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        #dataTable th, #dataTable td, #adminTable th, #adminTable td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        #dataTable th, #adminTable th { background-color: #f2f2f2; color: #000000; position: sticky; top: 0; }
+        #dataTable tr:nth-child(even), #adminTable tr:nth-child(even) { background-color: #f9f9f9; }
+        #dataTable tr:hover, #adminTable tr:hover { background-color: #f1f1f1; }
+        .action-btn { padding: 6px 12px; margin: 2px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; display: inline-flex; align-items: center; gap: 5px; }
+        .view-btn { background-color: #007bff; color: white; }
+        .view-btn:hover { background-color: #0069d9; }
+        .approve-btn { background-color: #28a745; color: white; }
+        .approve-btn:hover { background-color: #218838; }
+        .reject-btn { background-color: #dc3545; color: white; }
+        .reject-btn:hover { background-color: #c82333; }
+        .delete-btn { background-color: #dc3545; color: white; }
+        .delete-btn:hover { background-color: #c82333; }
+        /* .map-legend removed */
+        .stats-panel { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 15px; margin-top: 15px; }
+        .stat-card { background: #f8f9fa; padding: 15px; border-radius: 8px; text-align: center; border-top: 4px solid #FFD700; }
+        .stat-value { font-size: 1.8rem; font-weight: bold; color: #000000; }
+        .stat-label { font-size: 0.85rem; color: #666; margin-top: 5px; }
+        .stat-icon { font-size: 2rem; color: #FFD700; margin-bottom: 5px; }
+        .instruction { background-color: #e7f3ff; padding: 15px; border-radius: 8px; margin-bottom: 20px; border-left: 5px solid #007bff; }
+        .instruction h3 { color: #0056b3; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
+        .instruction ol { padding-left: 20px; }
+        .instruction li { margin-bottom: 8px; line-height: 1.5; }
+        .offline-notice { background: #fff3cd; border: 1px solid #ffeaa7; color: #856404; padding: 10px; border-radius: 5px; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; display: none; }
+        .offline-notice.active { display: flex; }
+        .modal { display: none; position: fixed; z-index: 1001; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); }
+        .modal-content { background-color: white; margin: 3% auto; padding: 30px; border-radius: 10px; width: 90%; max-width: 850px; box-shadow: 0 5px 15px rgba(0,0,0,0.3); position: relative; max-height: 85vh; overflow-y: auto; }
+        .close-modal { position: absolute; right: 20px; top: 20px; font-size: 28px; cursor: pointer; color: #666; }
+        .close-modal:hover { color: #000; }
+        .toggle-section { display: flex; align-items: center; gap: 15px; margin-bottom: 15px; padding: 15px; background: #f8f9fa; border-radius: 8px; }
+        .toggle-switch { position: relative; display: inline-block; width: 60px; height: 30px; }
+        .toggle-switch input { opacity: 0; width: 0; height: 0; }
+        .toggle-slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+        .toggle-slider:before { position: absolute; content: ""; height: 22px; width: 22px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .toggle-slider { background-color: #FFD700; }
+        input:checked + .toggle-slider:before { transform: translateX(30px); }
+        .ownership-section { background: #f0f8ff; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid #007bff; }
+        .kibanja-subsection { background: #fff3e0; padding: 15px; border-radius: 8px; margin-top: 10px; border-left: 4px solid #fd7e14; display: none; }
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; }
+        .status-pending { background: #fff3cd; color: #856404; }
+        .status-approved { background: #d4edda; color: #155724; }
+        .status-rejected { background: #f8d7da; color: #721c24; }
+        .admin-map-container { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .admin-controls { background: white; border-radius: 10px; padding: 20px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); margin-bottom: 20px; }
+        .review-actions { display: flex; gap: 10px; margin-top: 15px; }
+        .measurement-controls { display: flex; gap: 10px; margin-bottom: 10px; padding: 10px; background: #f8f9fa; border-radius: 5px; flex-wrap: wrap; }
+        .unit-selector { display: flex; gap: 5px; align-items: center; flex-wrap: wrap; }
+        .unit-btn { padding: 5px 10px; border: 1px solid #ddd; background: white; border-radius: 3px; cursor: pointer; font-size: 12px; }
+        .unit-btn.active { background: #FFD700; border-color: #FFD700; }
+        .validation-error { color: #dc3545; font-size: 0.875rem; margin-top: 5px; display: none; }
+        .validation-error.show { display: block; }
+        .no-data { text-align: center; padding: 40px 20px; color: #777; font-style: italic; }
+        .location-fill-status { font-size: 12px; color: #28a745; margin-top: 5px; }
+        .location-fill-status.loading { color: #ffc107; }
+        .location-fill-status.error { color: #dc3545; }
+        footer { text-align: center; margin-top: 40px; padding: 20px; color: #666; font-size: 0.9rem; border-top: 1px solid #eee; }
+        .logo { font-weight: bold; color: #000000; font-size: 1.2rem; }
+        .capture-buttons { display: flex; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+        .capture-btn { padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-weight: 600; flex: 1; min-width: 120px; text-align: center; transition: all 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .capture-btn.start { background: #28a745; color: white; }
+        .capture-btn.start:hover { background: #218838; }
+        .capture-btn.start:disabled { background: #6c757d; cursor: not-allowed; }
+        .capture-btn.add { background: #007bff; color: white; }
+        .capture-btn.add:hover { background: #0069d9; }
+        .capture-btn.add:disabled { background: #6c757d; cursor: not-allowed; }
+        .capture-btn.end { background: #dc3545; color: white; }
+        .capture-btn.end:hover { background: #c82333; }
+        .capture-btn.end:disabled { background: #6c757d; cursor: not-allowed; }
+        .capture-btn.clear { background: #6c757d; color: white; }
+        .capture-btn.clear:hover { background: #5a6268; }
+        .point-counter { font-weight: bold; color: #000000; }
+        .stats-row { display: flex; gap: 15px; flex-wrap: wrap; }
+        .stats-row .stat-card { flex: 1; min-width: 150px; }
+        @media (max-width: 1100px) { .main-container { flex-direction: column; } .map-container, .data-container { min-width: 100%; } .header-content { flex-direction: column; text-align: center; gap: 15px; } .user-section { flex-direction: column; } .user-info { text-align: center; } }
+        @media (max-width: 768px) { .data-header { flex-direction: column; align-items: flex-start; } .data-controls { width: 100%; } .search-box input { width: 100%; } .filter-box { width: 100%; } .filter-box select { flex: 1; } .form-row { flex-direction: column; gap: 0; } .capture-buttons { flex-direction: column; } .capture-btn { width: 100%; } .stats-row { flex-direction: column; } }
     </style>
 </head>
 <body>
     <header>
         <div class="header-content">
             <div class="header-title">
-                <h1><i class="fas fa-map-marked-alt"></i> Bibanja Land Use Data Collection/Mapping Tool</h1>
+                <h1><i class="fas fa-map-marked-alt"></i> Kampala Land Use Data Collection System</h1>
                 <p class="subtitle" id="dashboardSubtitle">Field Collector Dashboard</p>
                 <div class="status-indicator">
                     <div class="online-status">
@@ -1008,74 +197,50 @@
     
     <div class="container">
         <div class="dashboard-tabs">
-            <button class="tab-btn active" id="fieldTab">
-                <i class="fas fa-map-pin"></i> Field Collector
-            </button>
-            <button class="tab-btn" id="adminTab">
-                <i class="fas fa-tasks"></i> Administrator
-            </button>
+            <button class="tab-btn active" id="fieldTab"><i class="fas fa-map-pin"></i> Field Collector</button>
+            <button class="tab-btn" id="adminTab"><i class="fas fa-tasks"></i> Administrator</button>
         </div>
         
-        <!-- FIELD COLLECTOR DASHBOARD -->
+        <!-- Field Collector Dashboard -->
         <div id="fieldDashboard" class="dashboard-content">
             <div class="offline-notice" id="offlineNotice">
                 <i class="fas fa-wifi-slash"></i>
-                <div>
-                    <strong>You are offline</strong>
-                    <p>Data will be saved locally and synced when connection is restored</p>
-                </div>
+                <div><strong>You are offline</strong><p>Data will be saved locally and synced when connection is restored</p></div>
             </div>
             
             <div class="instruction">
                 <h3><i class="fas fa-info-circle"></i> How to use this tool:</h3>
                 <ol>
-                    <li><strong>Select map mode:</strong> Pinpoint for single points or Area for polygons</li>
-                    <li><strong>Click on the map</strong> to place points or draw area boundaries</li>
-                    <li><strong>Fill in the land use data form</strong> for the selected location/area</li>
-                    <li><strong>Enable GPS tracking</strong> to show your live location on the map</li>
-                    <li><strong>Upload photos</strong> of the land use if available</li>
-                    <li><strong>Submit the data</strong> for administrator review</li>
+                    <li><strong>Ensure GPS is active</strong> (check the status indicator).</li>
+                    <li>Click <strong>"Start Capture"</strong> to begin recording your current location as the starting point.</li>
+                    <li>Walk around the land and click <strong>"Add Point"</strong> at each corner/vertex.</li>
+                    <li>When done, click <strong>"End Capture"</strong> – the polygon will be closed and area calculated in acres.</li>
+                    <li>Location details (District, Subcounty, Parish) are auto‑filled from the polygon center.</li>
+                    <li>Fill in the rest of the form and <strong>submit</strong> for review.</li>
                 </ol>
             </div>
             
             <div class="main-container">
                 <div class="map-container">
-                    <h2><i class="fas fa-map"></i> Uganda Satellite Map</h2>
+                    <h2><i class="fas fa-map"></i> Kampala Ortho Map</h2>
                     
                     <div class="layer-controls">
-                        <button class="layer-btn active" data-layer="satellite">
-                            <i class="fas fa-satellite"></i> Satellite
-                        </button>
-                        <button class="layer-btn" data-layer="street">
-                            <i class="fas fa-road"></i> Street Map
-                        </button>
-                        <button class="layer-btn" data-layer="hybrid">
-                            <i class="fas fa-layer-group"></i> Hybrid
-                        </button>
+                        <button class="layer-btn active" data-layer="satellite"><i class="fas fa-satellite"></i> Ortho</button>
+                        <button class="layer-btn" data-layer="street"><i class="fas fa-road"></i> Street</button>
+                        <button class="layer-btn" data-layer="hybrid"><i class="fas fa-layer-group"></i> Hybrid</button>
                     </div>
                     
-                    <div class="map-mode-selector">
-                        <button class="mode-btn active" id="pinpointModeBtn">
-                            <i class="fas fa-map-pin"></i> Pinpoint Mode
-                        </button>
-                        <button class="mode-btn" id="areaModeBtn">
-                            <i class="fas fa-draw-polygon"></i> Area Mode
-                        </button>
-                    </div>
-                    
-                    <div class="mode-instruction" id="pinpointInstruction">
-                        <i class="fas fa-mouse-pointer"></i> Click on the map to place a pinpoint marker
-                    </div>
-                    <div class="mode-instruction" id="areaInstruction" style="display: none;">
-                        <i class="fas fa-draw-polygon"></i> Click on the map to add polygon points. Double-click to finish.
-                    </div>
-                    
-                    <div class="measurement-controls" id="measurementControls" style="display: none;">
-                        <div class="unit-selector">
-                            <span>Area Unit:</span>
-                            <button class="unit-btn active" data-unit="hectares">Hectares</button>
-                            <button class="unit-btn" data-unit="acres">Acres</button>
-                            <button class="unit-btn" data-unit="square_meters">Square Meters</button>
+                    <div class="instruction" style="margin-bottom:10px;">
+                        <h4><i class="fas fa-route"></i> GPS Capture Controls</h4>
+                        <div class="capture-buttons">
+                            <button id="startCaptureBtn" class="capture-btn start"><i class="fas fa-play"></i> Start Capture</button>
+                            <button id="addPointBtn" class="capture-btn add" disabled><i class="fas fa-plus"></i> Add Point</button>
+                            <button id="endCaptureBtn" class="capture-btn end" disabled><i class="fas fa-stop"></i> End Capture</button>
+                            <button id="clearCaptureBtn" class="capture-btn clear"><i class="fas fa-undo"></i> Clear Path</button>
+                        </div>
+                        <div style="margin-top:8px; font-size:14px;">
+                            Points captured: <span id="pointCounter" class="point-counter">0</span>
+                            &nbsp;|&nbsp; Area: <span id="liveAreaDisplay">--</span> acres
                         </div>
                     </div>
                     
@@ -1097,19 +262,19 @@
                         <div class="area-details">
                             <div class="detail-item">
                                 <div class="detail-label"><i class="fas fa-map-pin"></i> Coordinates</div>
-                                <div class="detail-value" id="selectedCoords">Not selected</div>
+                                <div class="detail-value" id="selectedCoords">Not captured</div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label"><i class="fas fa-shapes"></i> Selection Type</div>
-                                <div class="detail-value" id="selectionType">Pinpoint</div>
+                                <div class="detail-value" id="selectionType">Polygon (GPS)</div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label"><i class="fas fa-ruler-combined"></i> Area Size</div>
-                                <div class="detail-value" id="areaSize">--</div>
+                                <div class="detail-value" id="areaSizeDisplay">--</div>
                             </div>
                             <div class="detail-item">
                                 <div class="detail-label"><i class="fas fa-crosshairs"></i> Center Point</div>
-                                <div class="detail-value" id="centerPoint">--</div>
+                                <div class="detail-value" id="centerPointDisplay">--</div>
                             </div>
                         </div>
                     </div>
@@ -1129,181 +294,88 @@
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="district" class="required"><i class="fas fa-landmark"></i> District</label>
-                                    <select id="district" required>
-                                        <option value="">Select District</option>
-                                        <option value="Kampala">Kampala</option>
-                                        <option value="Wakiso">Wakiso</option>
-                                        <option value="Mukono">Mukono</option>
-                                        <option value="Jinja">Jinja</option>
-                                        <option value="Mbarara">Mbarara</option>
-                                        <option value="Gulu">Gulu</option>
-                                        <option value="Lira">Lira</option>
-                                        <option value="Mbale">Mbale</option>
-                                        <option value="Masaka">Masaka</option>
-                                        <option value="Fort Portal">Fort Portal</option>
-                                        <option value="Arua">Arua</option>
-                                        <option value="Hoima">Hoima</option>
-                                        <option value="Other">Other</option>
-                                    </select>
-                                    <div class="validation-error" id="districtError">Please select a district</div>
+                                    <input type="text" id="district" required placeholder="Auto-filled" readonly style="background:#f0f0f0;">
+                                    <div class="validation-error" id="districtError">Please capture a polygon on the map</div>
                                 </div>
-                                
                                 <div class="form-group">
                                     <label for="subcounty" class="required"><i class="fas fa-map-pin"></i> Subcounty</label>
-                                    <input type="text" id="subcounty" required placeholder="Enter subcounty name">
-                                    <div class="validation-error" id="subcountyError">Please enter subcounty name</div>
+                                    <input type="text" id="subcounty" required placeholder="Auto-filled" readonly style="background:#f0f0f0;">
+                                    <div class="validation-error" id="subcountyError">Please capture a polygon on the map</div>
                                 </div>
                             </div>
-                            
                             <div class="form-group">
                                 <label for="parish"><i class="fas fa-village"></i> Parish/Village</label>
-                                <input type="text" id="parish" placeholder="Enter parish or village name">
+                                <input type="text" id="parish" placeholder="Auto-filled" readonly style="background:#f0f0f0;">
+                                <div id="locationFillStatus" class="location-fill-status">Waiting for polygon capture...</div>
                             </div>
                             
                             <div class="toggle-section">
-                                <label><i class="fas fa-house-user"></i> Are you a kibanja holder?</label>
+                                <label><i class="fas fa-file-contract"></i> Is this land titled/registered?</label>
                                 <label class="toggle-switch">
-                                    <input type="checkbox" id="isKibanjaHolder">
+                                    <input type="checkbox" id="isLandTitled">
                                     <span class="toggle-slider"></span>
                                 </label>
                             </div>
                             
-                            <div id="kibanjaSection" class="kibanja-section">
-                                <div class="form-group">
-                                    <label for="kibanjaDetails"><i class="fas fa-info-circle"></i> Kibanja Holder Details</label>
-                                    <textarea id="kibanjaDetails" rows="3" placeholder="Provide details about your kibanja"></textarea>
-                                </div>
-                                
-                                <div class="income-section">
-                                    <h3>
-                                        <i class="fas fa-money-bill-wave"></i> 
-                                        UGX INCOME FROM KIBANJA (Estimated Monthly)
-                                    </h3>
-                                    
+                            <div id="titleSection" class="title-section">
+                                <div class="form-row">
                                     <div class="form-group">
-                                        <label for="monthlyIncomeEstimate">
-                                            <i class="fas fa-coins"></i> Estimated Monthly Income (UGX)
-                                        </label>
-                                        <div class="currency-input">
-                                            <span class="currency-symbol">UGX</span>
-                                            <input type="number" id="monthlyIncomeEstimate" min="0" step="1000" placeholder="e.g., 150000">
-                                        </div>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="incomeSources">
-                                            <i class="fas fa-tasks"></i> Main Income Source
-                                        </label>
-                                        <select id="incomeSources">
-                                            <option value="">-- Select income source --</option>
-                                            <option value="crops">🌽 Crop sales</option>
-                                            <option value="livestock">🐄 Livestock sales</option>
-                                            <option value="rental">🏠 Rental income</option>
-                                            <option value="commercial">🏪 Commercial activities</option>
-                                            <option value="mixed">🔄 Mixed sources</option>
-                                            <option value="other">📌 Other</option>
-                                        </select>
-                                    </div>
-                                    
-                                    <div class="form-group">
-                                        <label for="incomeNotes">
-                                            <i class="fas fa-edit"></i> Income Notes
-                                        </label>
-                                        <textarea id="incomeNotes" rows="2" placeholder="Additional income details..."></textarea>
-                                    </div>
-                                    
-                                    <div class="income-total-box">
-                                        <span class="income-total-label">
-                                            <i class="fas fa-calculator"></i> Monthly Income:
-                                        </span>
-                                        <span class="income-total-value" id="incomeDisplay">
-                                            UGX 0
-                                        </span>
-                                    </div>
-                                </div>
-                                
-                                <div class="toggle-section">
-                                    <label><i class="fas fa-file-certificate"></i> Do you have a Certificate of Occupancy?</label>
-                                    <label class="toggle-switch">
-                                        <input type="checkbox" id="hasCertificate">
-                                        <span class="toggle-slider"></span>
-                                    </label>
-                                </div>
-                                
-                                <div id="certificateSection" class="certificate-section">
-                                    <div class="form-row">
-                                        <div class="form-group">
-                                            <label for="certificateNumber"><i class="fas fa-hashtag"></i> Certificate Number</label>
-                                            <input type="text" id="certificateNumber" placeholder="Enter certificate number">
-                                        </div>
-                                        <div class="form-group">
-                                            <label for="certificateDate"><i class="fas fa-calendar-alt"></i> Issue Date</label>
-                                            <input type="date" id="certificateDate">
-                                        </div>
+                                        <label for="blockNumber"><i class="fas fa-cube"></i> Block Number</label>
+                                        <input type="text" id="blockNumber" placeholder="Optional">
                                     </div>
                                     <div class="form-group">
-                                        <label for="certificateIssuer"><i class="fas fa-landmark"></i> Issuing Authority</label>
-                                        <input type="text" id="certificateIssuer" placeholder="e.g., District Land Board">
-                                    </div>
-                                </div>
-                                
-                                <div class="form-group">
-                                    <label for="landlordStatus"><i class="fas fa-user-tie"></i> Landlord Status</label>
-                                    <select id="landlordStatus">
-                                        <option value="">Select landlord status</option>
-                                        <option value="present_landlord">👤 Landlord is present/resident</option>
-                                        <option value="absentee_landlord">🚶 Absentee landlord</option>
-                                        <option value="unknown">❓ Landlord status unknown</option>
-                                        <option value="no_landlord">✅ No landlord</option>
-                                    </select>
-                                </div>
-                                
-                                <div id="landlordSection" class="landlord-section">
-                                    <div class="form-group">
-                                        <label for="landlordName"><i class="fas fa-user"></i> Landlord Name</label>
-                                        <input type="text" id="landlordName" placeholder="Enter landlord's name">
-                                    </div>
-                                    <div class="form-group">
-                                        <label for="landlordContact"><i class="fas fa-phone"></i> Landlord Contact</label>
-                                        <input type="text" id="landlordContact" placeholder="Enter landlord's contact">
+                                        <label for="plotNumber"><i class="fas fa-th-large"></i> Plot Number</label>
+                                        <input type="text" id="plotNumber" placeholder="Optional">
                                     </div>
                                 </div>
                             </div>
                             
                             <div class="form-group">
-                                <label for="landSize" class="required"><i class="fas fa-ruler-combined"></i> Land Size (Hectares)</label>
-                                <input type="number" id="landSize" step="0.01" min="0" required placeholder="Enter land size in hectares">
-                                <div class="validation-error" id="landSizeError">Please enter land size</div>
+                                <label for="landSize" class="required"><i class="fas fa-ruler-combined"></i> Land Size (Acres)</label>
+                                <input type="number" id="landSize" step="0.01" min="0" required placeholder="Auto-calculated after capture" readonly style="background:#f0f0f0;">
+                                <div class="validation-error" id="landSizeError">Please capture a polygon to calculate area</div>
+                                <small style="color: #666; display: block; margin-top: 5px;">
+                                    <i class="fas fa-info-circle"></i> Area is automatically calculated when you end the capture.
+                                </small>
                             </div>
                             
                             <div class="form-group">
-                                <label for="landUserAbility" class="required"><i class="fas fa-users"></i> Land User Ability</label>
-                                <select id="landUserAbility" required>
-                                    <option value="">Select land user ability</option>
-                                    <option value="subsistence">🌱 Subsistence Farming</option>
-                                    <option value="semi_commercial">🌿 Semi-Commercial</option>
-                                    <option value="commercial">💰 Commercial</option>
-                                    <option value="mixed_farming">🌽🐄 Mixed Farming</option>
-                                    <option value="pastoral">🐑 Pastoral</option>
-                                    <option value="residential">🏡 Residential</option>
-                                    <option value="business">🏪 Business</option>
-                                    <option value="idle">⏸️ Idle</option>
+                                <label for="landUseType" class="required"><i class="fas fa-tags"></i> Pre-dominant Land Use</label>
+                                <select id="landUseType" required>
+                                    <option value="">Select Land Use</option>
+                                    <option value="Agricultural">Agricultural (Crops)</option>
+                                    <option value="Residential">Residential</option>
+                                    <option value="Commercial">Commercial</option>
+                                    <option value="Industrial">Industrial</option>
+                                    <option value="Tree Planting">Tree Planting</option>
+                                    <option value="Pastoral">Pastoral / Grazing</option>
+                                    <option value="Mixed Use">Mixed Use</option>
+                                    <option value="Other">Other</option>
                                 </select>
-                                <div class="validation-error" id="landUserAbilityError">Please select land user ability</div>
+                                <div class="validation-error" id="landUseTypeError">Please select land use type</div>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="landCover"><i class="fas fa-tree"></i> Land Cover</label>
+                                <select id="landCover">
+                                    <option value="">Select Land Cover</option>
+                                    <option value="Dense Forest">Dense Forest</option>
+                                    <option value="Woodland">Woodland</option>
+                                    <option value="Grassland">Grassland</option>
+                                    <option value="Cropland">Cropland</option>
+                                    <option value="Built-up">Built-up Area</option>
+                                </select>
                             </div>
                             
                             <div class="form-row">
                                 <div class="form-group">
-                                    <label for="landCover"><i class="fas fa-tree"></i> Land Cover</label>
-                                    <select id="landCover">
-                                        <option value="">Select Land Cover</option>
-                                        <option value="Dense Forest">🌳 Dense Forest</option>
-                                        <option value="Woodland">🌲 Woodland</option>
-                                        <option value="Grassland">🌿 Grassland</option>
-                                        <option value="Cropland">🌽 Cropland</option>
-                                        <option value="Built-up">🏙️ Built-up Area</option>
-                                        <option value="Water">💧 Water</option>
+                                    <label for="ownership" class="required"><i class="fas fa-user-tag"></i> Ownership Type</label>
+                                    <select id="ownership" required>
+                                        <option value="">Select Ownership</option>
+                                        <option value="kibanja_holder">Kibanja Holder</option>
+                                        <option value="landlord">Landlord</option>
                                     </select>
+                                    <div class="validation-error" id="ownershipError">Please select ownership type</div>
                                 </div>
                                 <div class="form-group">
                                     <label for="cropType"><i class="fas fa-seedling"></i> Crop Type</label>
@@ -1311,23 +383,32 @@
                                 </div>
                             </div>
                             
-                            <div class="photo-upload-section">
-                                <h3><i class="fas fa-camera"></i> Photo Upload</h3>
-                                <div class="photo-preview-container" id="photoPreviewContainer"></div>
-                                <div class="upload-area" id="uploadArea">
-                                    <i class="fas fa-cloud-upload-alt"></i>
-                                    <p>Click to select photos or drag and drop</p>
-                                    <small>Maximum 5 photos, 5MB each</small>
-                                    <input type="file" id="photoUpload" accept="image/*" multiple style="display: none;">
+                            <div id="kibanjaSubsection" class="kibanja-subsection">
+                                <div class="form-group">
+                                    <label for="kibanjaStatus" class="required"><i class="fas fa-house-user"></i> Kibanja Holder Status</label>
+                                    <select id="kibanjaStatus" required>
+                                        <option value="">Select status</option>
+                                        <option value="kibanja_with_present_landlord">Kibanja holder with landlord present</option>
+                                        <option value="kibanja_with_absentee_landlord">Kibanja holder with absentee landlord</option>
+                                    </select>
+                                    <div class="validation-error" id="kibanjaStatusError">Please select kibanja status</div>
                                 </div>
-                                <button type="button" id="uploadPhotoBtn" class="upload-btn">
-                                    <i class="fas fa-upload"></i> Upload Photos
-                                </button>
+                                <div class="form-group">
+                                    <label for="kibanjaDetails"><i class="fas fa-info-circle"></i> Additional Details</label>
+                                    <textarea id="kibanjaDetails" rows="2" placeholder="Additional kibanja details..."></textarea>
+                                </div>
+                            </div>
+                            
+                            <div id="landlordSection" class="title-section" style="display: none; border-left-color: #17a2b8;">
+                                <div class="form-group">
+                                    <label for="landlordDetails"><i class="fas fa-user-tie"></i> Landlord Details</label>
+                                    <textarea id="landlordDetails" rows="2" placeholder="Enter landlord details..."></textarea>
+                                </div>
                             </div>
                             
                             <div class="form-group">
-                                <label for="notes"><i class="fas fa-sticky-note"></i> Notes</label>
-                                <textarea id="notes" placeholder="Enter any observations..."></textarea>
+                                <label for="notes"><i class="fas fa-sticky-note"></i> Observations</label>
+                                <textarea id="notes" placeholder="Enter observations..."></textarea>
                             </div>
                             
                             <div class="form-actions">
@@ -1349,7 +430,7 @@
                     <div class="data-controls">
                         <div class="search-box">
                             <i class="fas fa-search"></i>
-                            <input type="text" id="searchMyRecords" placeholder="Search my records...">
+                            <input type="text" id="searchMyRecords" placeholder="Search...">
                         </div>
                         <div class="filter-box">
                             <select id="filterMyStatus">
@@ -1361,7 +442,6 @@
                         </div>
                     </div>
                 </div>
-                
                 <div style="overflow-x: auto;">
                     <table id="dataTable">
                         <thead>
@@ -1369,10 +449,9 @@
                                 <th>ID</th>
                                 <th>District</th>
                                 <th>Subcounty</th>
-                                <th>Land User Ability</th>
-                                <th>Size (Ha)</th>
-                                <th>Kibanja</th>
-                                <th>Monthly Income</th>
+                                <th>Land Use</th>
+                                <th>Size (Acres)</th>
+                                <th>Titled</th>
                                 <th>Status</th>
                                 <th>Date</th>
                                 <th>Actions</th>
@@ -1382,25 +461,40 @@
                     </table>
                 </div>
                 <div id="noDataMessage" class="no-data">
-                    <p><i class="fas fa-database"></i> No records submitted yet.</p>
+                    <p><i class="fas fa-database"></i> No records submitted yet. Capture a polygon and fill in the form.</p>
                 </div>
             </div>
         </div>
         
-        <!-- ADMINISTRATOR DASHBOARD -->
+        <!-- Administrator Dashboard -->
         <div id="adminDashboard" class="dashboard-content" style="display: none;">
+            <div class="stats-panel">
+                <h2><i class="fas fa-chart-pie"></i> Statistics Dashboard</h2>
+                <div class="stats-grid" id="statsContainer">
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-landmark"></i></div><div class="stat-value" id="totalRecords">0</div><div class="stat-label">Total Submissions</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-users"></i></div><div class="stat-value" id="kibanjaHolders">0</div><div class="stat-label">Kibanja Holders</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-user-tie"></i></div><div class="stat-value" id="landlords">0</div><div class="stat-label">Landlords</div></div>
+                    <div class="stat-card"><div class="stat-icon"><i class="fas fa-arrows-alt-h"></i></div><div class="stat-value" id="totalArea">0</div><div class="stat-label">Total Land (Acres)</div></div>
+                    <div class="stat-card" style="border-top-color:#FFD700;"><div class="stat-icon"><i class="fas fa-clock"></i></div><div class="stat-value" id="pendingCount">0</div><div class="stat-label">Pending Review</div></div>
+                    <div class="stat-card" style="border-top-color:#28a745;"><div class="stat-icon"><i class="fas fa-check-circle"></i></div><div class="stat-value" id="approvedCount">0</div><div class="stat-label">Approved</div></div>
+                    <div class="stat-card" style="border-top-color:#dc3545;"><div class="stat-icon"><i class="fas fa-times-circle"></i></div><div class="stat-value" id="rejectedCount">0</div><div class="stat-label">Rejected</div></div>
+                    <div class="stat-card" style="border-top-color:#17a2b8;"><div class="stat-icon"><i class="fas fa-file-contract"></i></div><div class="stat-value" id="titledCount">0</div><div class="stat-label">Titled Land</div></div>
+                    <div class="stat-card" style="border-top-color:#fd7e14;"><div class="stat-icon"><i class="fas fa-tree"></i></div><div class="stat-value" id="untitledCount">0</div><div class="stat-label">Untitled Land</div></div>
+                </div>
+            </div>
+            
             <div class="admin-controls">
                 <h2><i class="fas fa-tasks"></i> Administrator Controls</h2>
                 <div class="form-row">
                     <div class="form-group">
-                        <label><i class="fas fa-search"></i> Search Records</label>
-                        <input type="text" id="adminSearch" placeholder="Search by district, collector, or ID">
+                        <label><i class="fas fa-search"></i> Search</label>
+                        <input type="text" id="adminSearch" placeholder="Search records...">
                     </div>
                     <div class="form-group">
-                        <label><i class="fas fa-filter"></i> Filter by Status</label>
+                        <label><i class="fas fa-filter"></i> Status</label>
                         <select id="adminStatusFilter">
-                            <option value="">All Status</option>
-                            <option value="pending">Pending Review</option>
+                            <option value="">All</option>
+                            <option value="pending">Pending</option>
                             <option value="approved">Approved</option>
                             <option value="rejected">Rejected</option>
                         </select>
@@ -1409,104 +503,67 @@
                 <div class="export-buttons">
                     <button id="exportAllCSV" class="btn-export"><i class="fas fa-file-csv"></i> Export CSV</button>
                     <button id="exportAllJSON" class="btn-export"><i class="fas fa-file-code"></i> Export JSON</button>
-                    <button id="printAll" class="btn-export btn-print"><i class="fas fa-print"></i> Print Report</button>
+                    <button id="printAll" class="btn-export btn-print"><i class="fas fa-print"></i> Print</button>
                 </div>
             </div>
             
             <div class="admin-map-container">
                 <h2><i class="fas fa-map-marked-alt"></i> All Submission Locations</h2>
-                <div style="margin-bottom: 10px; display: flex; gap: 15px; align-items: center;">
-                    <span><span style="display: inline-block; width: 12px; height: 12px; background: #FFD700; border-radius: 50%; margin-right: 5px;"></span> Pending</span>
-                    <span><span style="display: inline-block; width: 12px; height: 12px; background: #28a745; border-radius: 50%; margin-right: 5px;"></span> Approved</span>
-                    <span><span style="display: inline-block; width: 12px; height: 12px; background: #dc3545; border-radius: 50%; margin-right: 5px;"></span> Rejected</span>
-                </div>
+                <!-- Status indicators removed -->
                 <div id="adminMap"></div>
+                <p style="margin-top:10px;color:#666;font-size:0.9rem;"><i class="fas fa-info-circle"></i> Click marker to review</p>
             </div>
             
             <div class="data-display">
                 <div class="data-header">
                     <h2><i class="fas fa-clipboard-check"></i> Records for Review</h2>
                     <div class="data-controls">
-                        <div class="search-box">
-                            <i class="fas fa-search"></i>
-                            <input type="text" id="searchReviewRecords" placeholder="Search records...">
-                        </div>
-                        <div class="filter-box">
-                            <select id="filterReviewStatus">
-                                <option value="">All Status</option>
-                                <option value="pending">Pending</option>
-                                <option value="approved">Approved</option>
-                                <option value="rejected">Rejected</option>
-                            </select>
-                        </div>
+                        <div class="search-box"><i class="fas fa-search"></i><input type="text" id="searchReviewRecords" placeholder="Search..."></div>
+                        <div class="filter-box"><select id="filterReviewStatus"><option value="">All</option><option value="pending">Pending</option><option value="rejected">Rejected</option></select></div>
                     </div>
                 </div>
-                
-                <div style="overflow-x: auto;">
+                <div style="overflow-x:auto;">
                     <table id="adminTable">
                         <thead>
                             <tr>
-                                <th>ID</th>
-                                <th>Collector</th>
-                                <th>District</th>
-                                <th>Subcounty</th>
-                                <th>Land Use</th>
-                                <th>Size</th>
-                                <th>Income</th>
-                                <th>Status</th>
-                                <th>Date</th>
-                                <th>Actions</th>
+                                <th>ID</th><th>Collector</th><th>District</th><th>Subcounty</th>
+                                <th>Land Use</th><th>Size (Acres)</th><th>Titled</th>
+                                <th>Status</th><th>Date</th><th>Actions</th>
                             </tr>
                         </thead>
                         <tbody id="adminTableBody"></tbody>
                     </table>
                 </div>
                 <div id="noReviewData" class="no-data">
-                    <p><i class="fas fa-check-circle"></i> No records to display.</p>
+                    <p><i class="fas fa-check-circle"></i> All records reviewed.</p>
                 </div>
             </div>
         </div>
-        
-        <div class="map-legend">
-            <div class="legend-title"><i class="fas fa-palette"></i> Legend</div>
-            <div class="legend-item"><div class="legend-color" style="background: #FFD700;"></div><span>Pending</span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #28a745;"></div><span>Approved</span></div>
-            <div class="legend-item"><div class="legend-color" style="background: #dc3545;"></div><span>Rejected</span></div>
-        </div>
     </div>
     
-    <!-- RECORD DETAILS MODAL -->
     <div id="recordDetailsModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="closeModal()">&times;</span>
+            <span class="close-modal" onclick="closeRecordDetails()">&times;</span>
             <h2 id="modalTitle">Record Details</h2>
             <div id="recordDetailsContent"></div>
-            <div id="adminReviewActions" style="margin-top: 20px; border-top: 2px solid #FFD700; padding-top: 20px;">
+            <div id="adminReviewActions" style="margin-top:20px;display:none;">
                 <h3><i class="fas fa-clipboard-check"></i> Review Actions</h3>
                 <div class="form-group">
-                    <label for="reviewComments"><i class="fas fa-comment"></i> Review Comments</label>
-                    <textarea id="reviewComments" rows="3" placeholder="Enter review comments (optional)"></textarea>
+                    <label for="reviewComments"><i class="fas fa-comment"></i> Comments</label>
+                    <textarea id="reviewComments" rows="3" placeholder="Optional comments"></textarea>
                 </div>
                 <div class="review-actions">
-                    <button onclick="approveCurrentRecord()" class="btn approve-btn" style="flex: 1;">
-                        <i class="fas fa-check"></i> Approve Record
-                    </button>
-                    <button onclick="showRejectForm()" class="btn reject-btn" style="flex: 1;">
-                        <i class="fas fa-times"></i> Reject Record
-                    </button>
+                    <button onclick="approveRecord()" class="btn approve-btn" style="flex:1;"><i class="fas fa-check"></i> Approve</button>
+                    <button onclick="showRejectSection()" class="btn reject-btn" style="flex:1;"><i class="fas fa-times"></i> Reject</button>
                 </div>
-                <div id="rejectForm" style="display: none; margin-top: 15px; padding: 15px; background: #f8d7da; border-radius: 5px;">
+                <div id="rejectSection" style="display:none;margin-top:15px;padding:15px;background:#f8d7da;border-radius:5px;">
                     <div class="form-group">
-                        <label for="rejectReason" class="required"><i class="fas fa-exclamation-triangle"></i> Reason for Rejection</label>
-                        <textarea id="rejectReason" rows="3" placeholder="Please provide reason for rejection" required></textarea>
+                        <label for="rejectReason" class="required"><i class="fas fa-exclamation-triangle"></i> Reason</label>
+                        <textarea id="rejectReason" rows="3" placeholder="Reason for rejection" required></textarea>
                     </div>
                     <div class="review-actions">
-                        <button onclick="rejectCurrentRecord()" class="btn reject-btn" style="flex: 1;">
-                            <i class="fas fa-paper-plane"></i> Submit Rejection
-                        </button>
-                        <button onclick="hideRejectForm()" class="btn btn-secondary" style="flex: 1;">
-                            <i class="fas fa-times"></i> Cancel
-                        </button>
+                        <button onclick="rejectRecord()" class="btn reject-btn" style="flex:1;"><i class="fas fa-paper-plane"></i> Submit</button>
+                        <button onclick="hideRejectSection()" class="btn btn-secondary" style="flex:1;"><i class="fas fa-times"></i> Cancel</button>
                     </div>
                 </div>
             </div>
@@ -1515,254 +572,322 @@
     
     <footer>
         <div class="container">
-            <p><span class="logo">Uganda Land Use System</span> | Field Data Collection • Administrator Review</p>
+            <p><span class="logo">Kampala Land Use System</span> | GPS‑based Area Capture • Field Data Collection • Admin Review</p>
+            <p>Focused on Kampala District</p>
         </div>
     </footer>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/leaflet.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.js"></script>
-    
     <script>
-        // ==================== APPLICATION STATE ====================
+        // ===================================================================
+        // APPLICATION STATE (Updated for Kampala)
+        // ===================================================================
         const AppState = {
+            currentUser: 'Field Collector',
+            currentRole: 'field',
+            isOnline: navigator.onLine,
             landUseData: [],
+            currentPolygon: null,
+            capturePoints: [],
+            capturePolyline: null,
+            captureMarker: null,
+            isCapturing: false,
+            isEnded: false,
             selectedLocation: null,
-            selectedArea: null,
-            currentMode: 'pinpoint',
-            currentUnit: 'hectares',
-            drawnItems: null,
-            drawControl: null,
             userLocationMarker: null,
+            userLocationWatchId: null,
             isTrackingLocation: false,
             adminMap: null,
             adminMarkers: {},
             currentRecordId: null,
-            uploadedPhotos: [],
             fieldMap: null,
             satelliteLayer: null,
             streetLayer: null,
             hybridLayer: null,
-            areaUnits: { hectares: 0.0001, acres: 0.000247105, square_meters: 1 }
+            nominatimUrl: 'https://nominatim.openstreetmap.org/reverse',
+            areaUnits: { acres: 0.000247105, hectares: 0.0001, square_meters: 1 },
+            // Kampala bounds (approximate)
+            kampalaBounds: [[0.20, 32.45], [0.45, 32.70]],
+            currentGpsPosition: null
         };
 
-        // ==================== INITIALIZATION ====================
-        document.addEventListener('DOMContentLoaded', function() {
-            initializeFieldMap();
-            initializeDataManager();
-            setupEventListeners();
-            loadSampleData();
-        });
-
-        // ==================== MAP FUNCTIONS ====================
-        function initializeFieldMap() {
-            AppState.fieldMap = L.map('map').setView([1.3733, 32.2903], 7);
-            
-            // Satellite layer
-            AppState.satelliteLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-            }).addTo(AppState.fieldMap);
-            
-            // Street layer
-            AppState.streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-                maxZoom: 19
-            });
-            
-            // Hybrid layer
-            AppState.hybridLayer = L.tileLayer('https://{s}.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
-                maxZoom: 20,
-                subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-            });
-            
-            AppState.drawnItems = new L.FeatureGroup();
-            AppState.fieldMap.addLayer(AppState.drawnItems);
-            
-            activatePinpointMode();
-            startGPSTracking();
-            setupLayerControls();
-            setupUnitSelector();
-            setupUGXIncomeCalculator();
+        // ===================================================================
+        // REVERSE GEOCODING (unchanged)
+        // ===================================================================
+        async function reverseGeocode(lat, lng) {
+            try {
+                const url = AppState.nominatimUrl + '?lat=' + lat + '&lon=' + lng + '&format=json&zoom=16&addressdetails=1';
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Geocoding failed');
+                const data = await response.json();
+                if (data && data.address) {
+                    const a = data.address;
+                    let district = a.state_district || a.county || a.state || 'Kampala';
+                    let subcounty = a.subcounty || a.town || a.city || a.village || '';
+                    let parish = a.village || a.hamlet || a.suburb || a.neighbourhood || '';
+                    if (!district || district.toLowerCase().includes('kampala')) district = 'Kampala';
+                    if (!subcounty) subcounty = a.region || a.municipality || a.city_district || '';
+                    if (!parish) parish = a.village || a.hamlet || a.suburb || a.neighbourhood || a.quarter || '';
+                    return { district, subcounty, parish };
+                }
+                return null;
+            } catch (e) { console.error('Geocoding error:', e); return null; }
         }
 
-        function initializeAdminMap() {
-            if (!AppState.adminMap) {
-                AppState.adminMap = L.map('adminMap').setView([1.3733, 32.2903], 7);
-                L.tileLayer('https://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
-                    maxZoom: 20,
-                    subdomains: ['mt0', 'mt1', 'mt2', 'mt3']
-                }).addTo(AppState.adminMap);
+        async function fillLocationDetails(lat, lng) {
+            const statusEl = document.getElementById('locationFillStatus');
+            statusEl.textContent = '⏳ Fetching location...';
+            statusEl.className = 'location-fill-status loading';
+            const result = await reverseGeocode(lat, lng);
+            if (result) {
+                document.getElementById('district').value = result.district || 'Kampala';
+                document.getElementById('subcounty').value = result.subcounty || '';
+                document.getElementById('parish').value = result.parish || '';
+                statusEl.textContent = '✅ Location auto-filled';
+                statusEl.className = 'location-fill-status';
+                return true;
+            } else {
+                document.getElementById('district').value = 'Kampala';
+                document.getElementById('subcounty').value = '';
+                document.getElementById('parish').value = '';
+                statusEl.textContent = '⚠️ Could not auto-fill. Please enter manually.';
+                statusEl.className = 'location-fill-status error';
+                return false;
             }
-            loadAllSubmissionsToAdminMap();
         }
 
-        function setupLayerControls() {
-            document.querySelectorAll('.layer-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    const layer = this.dataset.layer;
-                    
-                    AppState.fieldMap.eachLayer(l => { if (l._url) AppState.fieldMap.removeLayer(l); });
-                    
-                    if (layer === 'satellite') AppState.satelliteLayer.addTo(AppState.fieldMap);
-                    else if (layer === 'street') AppState.streetLayer.addTo(AppState.fieldMap);
-                    else if (layer === 'hybrid') AppState.hybridLayer.addTo(AppState.fieldMap);
-                    
-                    AppState.fieldMap.addLayer(AppState.drawnItems);
-                    if (AppState.userLocationMarker) AppState.fieldMap.addLayer(AppState.userLocationMarker);
+        // ===================================================================
+        // MAP MANAGER (Updated for Kampala)
+        // ===================================================================
+        class MapManager {
+            static initFieldMap() {
+                AppState.fieldMap = L.map('map').setView([0.3136, 32.5811], 13); // Kampala center
+                AppState.fieldMap.setMaxBounds(AppState.kampalaBounds);
+                AppState.fieldMap.on('drag', function() {
+                    this.panInsideBounds(AppState.kampalaBounds, { animate: true });
                 });
-            });
-        }
 
-        function activatePinpointMode() {
-            AppState.currentMode = 'pinpoint';
-            document.getElementById('pinpointModeBtn').classList.add('active');
-            document.getElementById('areaModeBtn').classList.remove('active');
-            document.getElementById('pinpointInstruction').style.display = 'block';
-            document.getElementById('areaInstruction').style.display = 'none';
-            document.getElementById('measurementControls').style.display = 'none';
-            
-            if (AppState.drawControl) {
-                AppState.fieldMap.removeControl(AppState.drawControl);
-                AppState.drawControl = null;
+                AppState.satelliteLayer = L.tileLayer(
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '© Esri, Maxar',
+                        maxZoom: 19
+                    }).addTo(AppState.fieldMap);
+
+                AppState.streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '© OpenStreetMap',
+                    maxZoom: 19
+                });
+
+                AppState.hybridLayer = L.tileLayer('https://mt1.google.com/vt/lyrs=y&x={x}&y={y}&z={z}', {
+                    attribution: '© Google',
+                    maxZoom: 20
+                });
+
+                this.startGPSTracking();
+                this.setupLayerControls();
+                this.setupCaptureControls();
             }
-            
-            AppState.drawnItems.clearLayers();
-            AppState.fieldMap.off('click');
-            AppState.fieldMap.on('click', handlePinpointClick);
-            document.getElementById('selectionType').textContent = 'Pinpoint';
-        }
 
-        function activateAreaMode() {
-            AppState.currentMode = 'area';
-            document.getElementById('pinpointModeBtn').classList.remove('active');
-            document.getElementById('areaModeBtn').classList.add('active');
-            document.getElementById('pinpointInstruction').style.display = 'none';
-            document.getElementById('areaInstruction').style.display = 'block';
-            document.getElementById('measurementControls').style.display = 'block';
-            
-            AppState.fieldMap.off('click');
-            AppState.drawnItems.clearLayers();
-            
-            AppState.drawControl = new L.Control.Draw({
-                draw: {
-                    polygon: {
-                        allowIntersection: false,
-                        showArea: true,
-                        shapeOptions: { color: '#FFD700', fillColor: '#FFD700', fillOpacity: 0.3, weight: 3 }
-                    },
-                    rectangle: false, circle: false, marker: false, polyline: false
-                },
-                edit: { featureGroup: AppState.drawnItems }
-            });
-            
-            AppState.fieldMap.addControl(AppState.drawControl);
-            
-            AppState.fieldMap.on(L.Draw.Event.CREATED, function(e) {
-                const layer = e.layer;
-                AppState.drawnItems.clearLayers();
-                AppState.drawnItems.addLayer(layer);
-                AppState.selectedArea = layer;
-                updateAreaInfo(layer);
-                document.getElementById('saveBtn').disabled = false;
+            // ----- Capture Controls (unchanged) -----
+            static setupCaptureControls() {
+                const startBtn = document.getElementById('startCaptureBtn');
+                const addBtn = document.getElementById('addPointBtn');
+                const endBtn = document.getElementById('endCaptureBtn');
+                const clearBtn = document.getElementById('clearCaptureBtn');
+
+                startBtn.addEventListener('click', () => this.startCapture());
+                addBtn.addEventListener('click', () => this.addPoint());
+                endBtn.addEventListener('click', () => this.endCapture());
+                clearBtn.addEventListener('click', () => this.clearCapture());
+            }
+
+            static startCapture() {
+                if (!AppState.currentGpsPosition) {
+                    alert('GPS location not available. Please wait for GPS fix.');
+                    return;
+                }
+                if (AppState.isCapturing) {
+                    alert('Already capturing. Add a point or end capture.');
+                    return;
+                }
+                this.clearCapture(true);
+                AppState.capturePoints = [];
+                AppState.isCapturing = true;
+                AppState.isEnded = false;
+
+                const pos = AppState.currentGpsPosition;
+                AppState.capturePoints.push({ lat: pos.lat, lng: pos.lng });
+                this.updateCaptureDisplay();
+                this.showCapturePolyline();
+
+                document.getElementById('startCaptureBtn').disabled = true;
+                document.getElementById('addPointBtn').disabled = false;
+                document.getElementById('endCaptureBtn').disabled = false;
+                document.getElementById('addPointBtn').classList.add('active');
+                document.getElementById('endCaptureBtn').classList.add('active');
+
+                document.getElementById('selectedCoords').textContent = 'Starting point: ' + pos.lat.toFixed(6) + ', ' + pos.lng.toFixed(6);
                 document.getElementById('areaInfo').classList.add('active');
-            });
-            
-            AppState.fieldMap.on(L.Draw.Event.EDITED, function(e) {
-                e.layers.eachLayer(layer => {
-                    if (layer instanceof L.Polygon) {
-                        AppState.selectedArea = layer;
-                        updateAreaInfo(layer);
-                    }
+                document.getElementById('selectionType').textContent = 'GPS Capture (in progress)';
+                document.getElementById('areaSizeDisplay').textContent = '--';
+                document.getElementById('centerPointDisplay').textContent = '--';
+                document.getElementById('saveBtn').disabled = true;
+            }
+
+            static addPoint() {
+                if (!AppState.isCapturing || AppState.isEnded) {
+                    alert('Please start capture first.');
+                    return;
+                }
+                if (!AppState.currentGpsPosition) {
+                    alert('GPS location not available.');
+                    return;
+                }
+                const pos = AppState.currentGpsPosition;
+                AppState.capturePoints.push({ lat: pos.lat, lng: pos.lng });
+                this.updateCaptureDisplay();
+                this.showCapturePolyline();
+                document.getElementById('selectedCoords').textContent = 
+                    'Point ' + AppState.capturePoints.length + ': ' + pos.lat.toFixed(6) + ', ' + pos.lng.toFixed(6);
+            }
+
+            static endCapture() {
+                if (!AppState.isCapturing || AppState.isEnded) {
+                    alert('No active capture to end.');
+                    return;
+                }
+                if (AppState.capturePoints.length < 3) {
+                    alert('You need at least 3 points to form a polygon.');
+                    return;
+                }
+                const pts = AppState.capturePoints;
+                const closedPts = pts.concat([pts[0]]);
+                const latlngs = closedPts.map(p => [p.lat, p.lng]);
+                const polygon = L.polygon(latlngs, {
+                    color: '#28a745',
+                    fillColor: '#28a745',
+                    fillOpacity: 0.3,
+                    weight: 3
                 });
-            });
-            
-            document.getElementById('selectionType').textContent = 'Area Polygon';
-        }
 
-        function handlePinpointClick(e) {
-            const lat = e.latlng.lat;
-            const lng = e.latlng.lng;
-            
-            AppState.selectedLocation = {
-                latitude: lat,
-                longitude: lng,
-                timestamp: new Date().toISOString(),
-                type: 'pinpoint'
-            };
-            
-            AppState.drawnItems.clearLayers();
-            L.marker([lat, lng], {
-                icon: L.divIcon({
-                    className: 'pinpoint-marker',
-                    html: '<div style="background: #FF0000; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>',
-                    iconSize: [20, 20]
-                })
-            }).addTo(AppState.drawnItems);
-            
-            document.getElementById('selectedCoords').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-            document.getElementById('areaSize').textContent = '--';
-            document.getElementById('centerPoint').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-            document.getElementById('areaInfo').classList.add('active');
-            document.getElementById('saveBtn').disabled = false;
-            AppState.fieldMap.setView([lat, lng], 15);
-        }
+                if (AppState.capturePolyline) {
+                    AppState.fieldMap.removeLayer(AppState.capturePolyline);
+                    AppState.capturePolyline = null;
+                }
+                if (AppState.currentPolygon) {
+                    AppState.fieldMap.removeLayer(AppState.currentPolygon);
+                }
+                AppState.currentPolygon = polygon.addTo(AppState.fieldMap);
+                AppState.isEnded = true;
+                AppState.isCapturing = false;
 
-        function updateAreaInfo(layer) {
-            if (!(layer instanceof L.Polygon)) return;
-            
-            const bounds = layer.getBounds();
-            const center = bounds.getCenter();
-            const latlngs = layer.getLatLngs()[0];
-            const areaM2 = L.GeometryUtil.geodesicArea(latlngs);
-            const area = areaM2 * AppState.areaUnits[AppState.currentUnit];
-            
-            document.getElementById('selectedCoords').textContent = `${latlngs.length} points`;
-            document.getElementById('areaSize').textContent = `${area.toFixed(2)} ${AppState.currentUnit.replace('_', ' ')}`;
-            document.getElementById('centerPoint').textContent = `${center.lat.toFixed(6)}, ${center.lng.toFixed(6)}`;
-            
-            const areaHectares = areaM2 * AppState.areaUnits.hectares;
-            document.getElementById('landSize').value = areaHectares.toFixed(2);
-            
-            AppState.selectedLocation = {
-                latitude: center.lat,
-                longitude: center.lng,
-                timestamp: new Date().toISOString(),
-                type: 'area',
-                area: areaHectares,
-                coordinates: latlngs.map(ll => ({lat: ll.lat, lng: ll.lng}))
-            };
-        }
+                const areaM2 = L.GeometryUtil.geodesicArea(polygon.getLatLngs()[0]);
+                const areaAcres = areaM2 * AppState.areaUnits.acres;
 
-        function setupUnitSelector() {
-            document.querySelectorAll('.unit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    document.querySelectorAll('.unit-btn').forEach(b => b.classList.remove('active'));
-                    this.classList.add('active');
-                    AppState.currentUnit = this.dataset.unit;
-                    if (AppState.selectedArea) updateAreaInfo(AppState.selectedArea);
-                });
-            });
-        }
+                const center = polygon.getBounds().getCenter();
+                AppState.selectedLocation = {
+                    latitude: center.lat,
+                    longitude: center.lng,
+                    timestamp: new Date().toISOString(),
+                    type: 'area',
+                    area: areaAcres,
+                    coordinates: pts.map(p => ({ lat: p.lat, lng: p.lng }))
+                };
 
-        function startGPSTracking() {
-            if (navigator.geolocation) {
+                document.getElementById('selectionType').textContent = 'Polygon (GPS capture)';
+                document.getElementById('areaSizeDisplay').textContent = areaAcres.toFixed(2) + ' acres';
+                document.getElementById('centerPointDisplay').textContent = center.lat.toFixed(6) + ', ' + center.lng.toFixed(6);
+                document.getElementById('liveAreaDisplay').textContent = areaAcres.toFixed(2);
+                document.getElementById('landSize').value = areaAcres.toFixed(2);
+                document.getElementById('saveBtn').disabled = false;
+
+                fillLocationDetails(center.lat, center.lng);
+
+                document.getElementById('startCaptureBtn').disabled = false;
+                document.getElementById('addPointBtn').disabled = true;
+                document.getElementById('endCaptureBtn').disabled = true;
+                document.getElementById('addPointBtn').classList.remove('active');
+                document.getElementById('endCaptureBtn').classList.remove('active');
+
+                alert('✅ Capture completed!\nArea: ' + areaAcres.toFixed(2) + ' acres\nYou can now fill the rest of the form and submit.');
+            }
+
+            static clearCapture(silent = false) {
+                if (AppState.currentPolygon) {
+                    AppState.fieldMap.removeLayer(AppState.currentPolygon);
+                    AppState.currentPolygon = null;
+                }
+                if (AppState.capturePolyline) {
+                    AppState.fieldMap.removeLayer(AppState.capturePolyline);
+                    AppState.capturePolyline = null;
+                }
+                AppState.capturePoints = [];
+                AppState.isCapturing = false;
+                AppState.isEnded = false;
+                AppState.selectedLocation = null;
+
+                document.getElementById('pointCounter').textContent = '0';
+                document.getElementById('liveAreaDisplay').textContent = '--';
+                document.getElementById('selectedCoords').textContent = 'Not captured';
+                document.getElementById('areaSizeDisplay').textContent = '--';
+                document.getElementById('centerPointDisplay').textContent = '--';
+                document.getElementById('areaInfo').classList.remove('active');
+                document.getElementById('landSize').value = '';
+                document.getElementById('saveBtn').disabled = true;
+
+                document.getElementById('startCaptureBtn').disabled = false;
+                document.getElementById('addPointBtn').disabled = true;
+                document.getElementById('endCaptureBtn').disabled = true;
+                document.getElementById('addPointBtn').classList.remove('active');
+                document.getElementById('endCaptureBtn').classList.remove('active');
+
+                document.getElementById('district').value = '';
+                document.getElementById('subcounty').value = '';
+                document.getElementById('parish').value = '';
+                document.getElementById('locationFillStatus').textContent = 'Waiting for polygon capture...';
+                document.getElementById('locationFillStatus').className = 'location-fill-status';
+
+                if (!silent) {
+                    alert('Capture cleared.');
+                }
+            }
+
+            static showCapturePolyline() {
+                if (AppState.capturePolyline) {
+                    AppState.fieldMap.removeLayer(AppState.capturePolyline);
+                }
+                if (AppState.capturePoints.length < 2) return;
+                const latlngs = AppState.capturePoints.map(p => [p.lat, p.lng]);
+                AppState.capturePolyline = L.polyline(latlngs, {
+                    color: '#FFD700',
+                    weight: 4,
+                    dashArray: '5, 10'
+                }).addTo(AppState.fieldMap);
+            }
+
+            static updateCaptureDisplay() {
+                document.getElementById('pointCounter').textContent = AppState.capturePoints.length;
+            }
+
+            // ----- GPS Tracking (unchanged) -----
+            static startGPSTracking() {
+                if (!navigator.geolocation) return;
                 navigator.geolocation.watchPosition(
-                    position => {
-                        const lat = position.coords.latitude;
-                        const lng = position.coords.longitude;
-                        const accuracy = position.coords.accuracy;
-                        
-                        document.getElementById('currentLocation').textContent = `${lat.toFixed(6)}, ${lng.toFixed(6)}`;
-                        document.getElementById('locationAccuracy').textContent = `Accuracy: ${Math.round(accuracy)} meters`;
+                    (pos) => {
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        const acc = pos.coords.accuracy;
+                        AppState.currentGpsPosition = { lat, lng };
+                        document.getElementById('currentLocation').textContent = lat.toFixed(6) + ', ' + lng.toFixed(6);
+                        document.getElementById('locationAccuracy').textContent = 'Accuracy: ' + Math.round(acc) + ' meters';
                         document.getElementById('gpsIcon').className = 'fas fa-satellite gps-active';
                         document.getElementById('gpsStatus').textContent = 'GPS Active';
-                        
                         if (!AppState.userLocationMarker) {
                             AppState.userLocationMarker = L.marker([lat, lng], {
                                 icon: L.divIcon({
                                     className: 'user-location-marker',
-                                    html: '<div style="background-color: blue; width: 15px; height: 15px; border-radius: 50%; border: 3px solid white; box-shadow: 0 0 10px rgba(0,0,0,0.5);"></div>',
+                                    html: '<div style="background:blue;width:15px;height:15px;border-radius:50%;border:3px solid white;box-shadow:0 0 10px rgba(0,0,0,0.5);"></div>',
                                     iconSize: [15, 15]
                                 })
                             }).addTo(AppState.fieldMap);
@@ -1770,809 +895,698 @@
                             AppState.userLocationMarker.setLatLng([lat, lng]);
                         }
                     },
-                    error => {
-                        console.error('GPS Error:', error);
+                    (err) => {
+                        console.error('GPS Error:', err);
                         document.getElementById('gpsIcon').className = 'fas fa-satellite gps-inactive';
                         document.getElementById('gpsStatus').textContent = 'GPS Inactive';
-                    },
-                    { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
+                    }, { enableHighAccuracy: true, timeout: 5000, maximumAge: 0 }
                 );
             }
-        }
 
-        function loadAllSubmissionsToAdminMap() {
-            if (!AppState.adminMap) return;
-            
-            // Clear existing markers
-            Object.values(AppState.adminMarkers).forEach(marker => AppState.adminMap.removeLayer(marker));
-            AppState.adminMarkers = {};
-            
-            AppState.landUseData.forEach(record => {
-                if (!record.location) return;
-                
-                let marker;
-                const status = record.status || 'pending';
-                const color = getStatusColor(status);
-                
-                if (record.location.type === 'area' && record.location.coordinates) {
-                    marker = L.polygon(record.location.coordinates.map(c => [c.lat, c.lng]), {
-                        color: color,
-                        fillColor: color,
-                        fillOpacity: 0.3,
-                        weight: 2
-                    }).addTo(AppState.adminMap);
-                } else {
-                    marker = L.marker([record.location.latitude, record.location.longitude], {
-                        icon: getStatusIcon(status)
-                    }).addTo(AppState.adminMap);
-                }
-                
-                const incomeText = record.isKibanjaHolder && record.monthlyIncomeEstimate 
-                    ? `UGX ${record.monthlyIncomeEstimate.toLocaleString()}` 
-                    : 'N/A';
-                
-                marker.bindPopup(`
-                    <div style="font-size: 14px;">
-                        <strong>${record.district} - ${record.subcounty}</strong><br>
-                        <strong>Collector:</strong> ${record.collectorName}<br>
-                        <strong>Land Use:</strong> ${getLandUserAbilityLabel(record.landUserAbility)}<br>
-                        <strong>Size:</strong> ${record.landSize} Ha<br>
-                        <strong>Income:</strong> ${incomeText}<br>
-                        <strong>Status:</strong> <span style="color: ${color}; font-weight: bold;">${status.toUpperCase()}</span><br>
-                        <button onclick="viewRecordDetails('${record.id}')" style="margin-top: 5px; padding: 5px 10px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer;">
-                            <i class="fas fa-eye"></i> View Details
-                        </button>
-                    </div>
-                `);
-                
-                marker.on('click', () => viewRecordDetails(record.id));
-                AppState.adminMarkers[record.id] = marker;
-            });
-        }
-
-        function getStatusColor(status) {
-            return status === 'approved' ? '#28a745' : status === 'rejected' ? '#dc3545' : '#FFD700';
-        }
-
-        function getStatusIcon(status) {
-            const color = getStatusColor(status);
-            return L.divIcon({
-                className: 'custom-marker',
-                html: `<div style="background-color: ${color}; width: 15px; height: 15px; border-radius: 50%; border: 2px solid white; box-shadow: 0 0 5px rgba(0,0,0,0.5);"></div>`,
-                iconSize: [15, 15]
-            });
-        }
-
-        // ==================== DATA MANAGER FUNCTIONS ====================
-        function initializeDataManager() {
-            loadSavedData();
-            setupFormToggles();
-            setupPhotoUpload();
-            setupFormListeners();
-        }
-
-        function loadSavedData() {
-            try {
-                const saved = localStorage.getItem('ugandaLandUseData');
-                AppState.landUseData = saved ? JSON.parse(saved) : [];
-            } catch (e) {
-                console.error('Failed to load data:', e);
-                AppState.landUseData = [];
-            }
-        }
-
-        function saveData() {
-            try {
-                localStorage.setItem('ugandaLandUseData', JSON.stringify(AppState.landUseData));
-            } catch (e) {
-                console.error('Failed to save data:', e);
-            }
-        }
-
-        function setupFormToggles() {
-            document.getElementById('isKibanjaHolder').addEventListener('change', function() {
-                document.getElementById('kibanjaSection').style.display = this.checked ? 'block' : 'none';
-                if (!this.checked) {
-                    document.getElementById('certificateSection').style.display = 'none';
-                    document.getElementById('landlordSection').style.display = 'none';
-                }
-            });
-            
-            document.getElementById('hasCertificate').addEventListener('change', function() {
-                document.getElementById('certificateSection').style.display = this.checked ? 'block' : 'none';
-            });
-            
-            document.getElementById('landlordStatus').addEventListener('change', function() {
-                document.getElementById('landlordSection').style.display = 
-                    (this.value === 'present_landlord' || this.value === 'absentee_landlord') ? 'block' : 'none';
-            });
-        }
-
-        function setupPhotoUpload() {
-            const uploadArea = document.getElementById('uploadArea');
-            const photoUpload = document.getElementById('photoUpload');
-            
-            uploadArea.addEventListener('click', () => photoUpload.click());
-            document.getElementById('uploadPhotoBtn').addEventListener('click', () => photoUpload.click());
-            
-            photoUpload.addEventListener('change', e => handlePhotoUpload(e.target.files));
-            
-            uploadArea.addEventListener('dragover', e => {
-                e.preventDefault();
-                uploadArea.style.background = '#d1ecf1';
-            });
-            
-            uploadArea.addEventListener('dragleave', e => {
-                e.preventDefault();
-                uploadArea.style.background = '#f0f8ff';
-            });
-            
-            uploadArea.addEventListener('drop', e => {
-                e.preventDefault();
-                uploadArea.style.background = '#f0f8ff';
-                if (e.dataTransfer.files.length) handlePhotoUpload(e.dataTransfer.files);
-            });
-        }
-
-        function handlePhotoUpload(files) {
-            const maxFiles = 5;
-            const maxSize = 5 * 1024 * 1024;
-            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/gif'];
-            
-            if (AppState.uploadedPhotos.length + files.length > maxFiles) {
-                alert(`Maximum ${maxFiles} photos allowed`);
-                return;
-            }
-            
-            for (let i = 0; i < files.length; i++) {
-                const file = files[i];
-                
-                if (!allowedTypes.includes(file.type)) {
-                    alert(`File "${file.name}" is not an allowed image type`);
-                    continue;
-                }
-                
-                if (file.size > maxSize) {
-                    alert(`File "${file.name}" exceeds 5MB limit`);
-                    continue;
-                }
-                
-                const reader = new FileReader();
-                reader.onload = e => {
-                    const photoData = {
-                        id: Date.now() + i,
-                        name: file.name,
-                        size: file.size,
-                        type: file.type,
-                        data: e.target.result
-                    };
-                    AppState.uploadedPhotos.push(photoData);
-                    addPhotoPreview(photoData);
-                };
-                reader.readAsDataURL(file);
-            }
-            
-            document.getElementById('photoUpload').value = '';
-        }
-
-        function addPhotoPreview(photoData) {
-            const container = document.getElementById('photoPreviewContainer');
-            const div = document.createElement('div');
-            div.className = 'photo-preview';
-            div.id = `photo-preview-${photoData.id}`;
-            div.innerHTML = `
-                <img src="${photoData.data}" alt="${photoData.name}">
-                <button type="button" class="remove-photo" onclick="removePhoto(${photoData.id})">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            container.appendChild(div);
-        }
-
-        window.removePhoto = function(photoId) {
-            AppState.uploadedPhotos = AppState.uploadedPhotos.filter(p => p.id !== photoId);
-            const el = document.getElementById(`photo-preview-${photoId}`);
-            if (el) el.remove();
-        };
-
-        function setupFormListeners() {
-            document.getElementById('landUseForm').addEventListener('submit', handleFormSubmit);
-            document.getElementById('clearForm').addEventListener('click', clearForm);
-        }
-
-        function handleFormSubmit(e) {
-            e.preventDefault();
-            
-            if (!validateForm()) return;
-            if (!AppState.selectedLocation) {
-                alert('Please select a location on the map first!');
-                return;
-            }
-            
-            const formData = {
-                id: 'REC-' + Date.now() + '-' + Math.floor(Math.random() * 1000),
-                collectorName: document.getElementById('collectorName').value,
-                district: document.getElementById('district').value,
-                subcounty: document.getElementById('subcounty').value,
-                parish: document.getElementById('parish').value,
-                isKibanjaHolder: document.getElementById('isKibanjaHolder').checked,
-                kibanjaDetails: document.getElementById('kibanjaDetails').value || null,
-                monthlyIncomeEstimate: document.getElementById('monthlyIncomeEstimate').value ? parseFloat(document.getElementById('monthlyIncomeEstimate').value) : null,
-                incomeSources: document.getElementById('incomeSources').value || null,
-                incomeNotes: document.getElementById('incomeNotes').value || null,
-                hasCertificate: document.getElementById('hasCertificate').checked,
-                certificateNumber: document.getElementById('certificateNumber').value || null,
-                certificateDate: document.getElementById('certificateDate').value || null,
-                certificateIssuer: document.getElementById('certificateIssuer').value || null,
-                landlordStatus: document.getElementById('landlordStatus').value || null,
-                landlordName: document.getElementById('landlordName').value || null,
-                landlordContact: document.getElementById('landlordContact').value || null,
-                landSize: parseFloat(document.getElementById('landSize').value),
-                landUserAbility: document.getElementById('landUserAbility').value,
-                landCover: document.getElementById('landCover').value || null,
-                cropType: document.getElementById('cropType').value || null,
-                photos: AppState.uploadedPhotos.map(p => ({ name: p.name, size: p.size, type: p.type, data: p.data })),
-                notes: document.getElementById('notes').value || null,
-                location: AppState.selectedLocation,
-                timestamp: new Date().toISOString(),
-                status: 'pending',
-                reviewedBy: null,
-                reviewComments: null,
-                reviewDate: null
-            };
-            
-            AppState.landUseData.push(formData);
-            saveData();
-            refreshAllTables();
-            clearForm();
-            alert('✅ Record submitted successfully!');
-        }
-
-        function validateForm() {
-            let isValid = true;
-            const requiredFields = ['collectorName', 'district', 'subcounty', 'landSize', 'landUserAbility'];
-            
-            requiredFields.forEach(fieldId => {
-                const el = document.getElementById(fieldId);
-                if (!el.value.trim()) {
-                    showFieldError(el, 'This field is required');
-                    isValid = false;
-                } else {
-                    clearFieldError(el);
-                }
-            });
-            
-            if (!AppState.selectedLocation) {
-                alert('Please select a location on the map first!');
-                isValid = false;
-            }
-            
-            return isValid;
-        }
-
-        function showFieldError(el, message) {
-            const errorEl = document.getElementById(el.id + 'Error');
-            if (errorEl) {
-                errorEl.textContent = message;
-                errorEl.classList.add('show');
-            }
-        }
-
-        function clearFieldError(el) {
-            const errorEl = document.getElementById(el.id + 'Error');
-            if (errorEl) errorEl.classList.remove('show');
-        }
-
-        function clearForm() {
-            document.getElementById('landUseForm').reset();
-            document.getElementById('kibanjaSection').style.display = 'none';
-            document.getElementById('certificateSection').style.display = 'none';
-            document.getElementById('landlordSection').style.display = 'none';
-            document.getElementById('photoPreviewContainer').innerHTML = '';
-            AppState.uploadedPhotos = [];
-            
-            if (AppState.drawnItems) AppState.drawnItems.clearLayers();
-            AppState.selectedLocation = null;
-            AppState.selectedArea = null;
-            
-            document.getElementById('areaInfo').classList.remove('active');
-            document.getElementById('saveBtn').disabled = true;
-            
-            document.querySelectorAll('.validation-error').forEach(el => el.classList.remove('show'));
-            document.getElementById('incomeDisplay').textContent = 'UGX 0';
-        }
-
-        function setupUGXIncomeCalculator() {
-            const estInput = document.getElementById('monthlyIncomeEstimate');
-            const display = document.getElementById('incomeDisplay');
-            
-            if (estInput && display) {
-                estInput.addEventListener('input', function() {
-                    const val = this.value ? parseInt(this.value).toLocaleString() : '0';
-                    display.textContent = `UGX ${val}`;
+            // ----- LAYER CONTROLS (unchanged) -----
+            static setupLayerControls() {
+                document.querySelectorAll('.layer-btn').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        document.querySelectorAll('.layer-btn').forEach(b => b.classList.remove('active'));
+                        this.classList.add('active');
+                        const layer = this.dataset.layer;
+                        if (AppState.fieldMap) {
+                            AppState.fieldMap.eachLayer((l) => { if (l._url) AppState.fieldMap.removeLayer(l); });
+                            if (layer === 'satellite') AppState.satelliteLayer.addTo(AppState.fieldMap);
+                            else if (layer === 'street') AppState.streetLayer.addTo(AppState.fieldMap);
+                            else if (layer === 'hybrid') AppState.hybridLayer.addTo(AppState.fieldMap);
+                            if (AppState.capturePolyline) AppState.fieldMap.addLayer(AppState.capturePolyline);
+                            if (AppState.currentPolygon) AppState.fieldMap.addLayer(AppState.currentPolygon);
+                            if (AppState.userLocationMarker) AppState.fieldMap.addLayer(AppState.userLocationMarker);
+                        }
+                    });
                 });
             }
-        }
 
-        // ==================== TABLE FUNCTIONS ====================
-        function refreshAllTables() {
-            loadFieldRecords();
-            loadAdminRecords();
-            if (AppState.adminMap) loadAllSubmissionsToAdminMap();
-        }
-
-        function loadFieldRecords() {
-            const tbody = document.getElementById('dataTableBody');
-            const noData = document.getElementById('noDataMessage');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            const currentUser = document.getElementById('collectorName').value || 'Field Collector';
-            const records = AppState.landUseData.filter(r => r.collectorName === currentUser);
-            
-            if (records.length === 0) {
-                noData.style.display = 'block';
-                return;
+            // ----- ADMIN MAP (updated for Kampala) -----
+            static initAdminMap() {
+                AppState.adminMap = L.map('adminMap').setView([0.3136, 32.5811], 13);
+                AppState.adminMap.setMaxBounds(AppState.kampalaBounds);
+                AppState.adminMap.on('drag', function() {
+                    this.panInsideBounds(AppState.kampalaBounds, { animate: true });
+                });
+                L.tileLayer(
+                    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
+                        attribution: '© Esri, Maxar',
+                        maxZoom: 19
+                    }).addTo(AppState.adminMap);
+                this.loadAllSubmissionsToAdminMap();
             }
-            
-            noData.style.display = 'none';
-            records.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-            
-            records.forEach(record => {
-                const row = tbody.insertRow();
-                const statusClass = `status-${record.status}`;
-                const incomeText = record.isKibanjaHolder && record.monthlyIncomeEstimate 
-                    ? `UGX ${record.monthlyIncomeEstimate.toLocaleString()}` 
-                    : 'N/A';
-                
-                row.innerHTML = `
-                    <td>${record.id.substring(0, 8)}...</td>
-                    <td>${record.district}</td>
-                    <td>${record.subcounty}</td>
-                    <td>${getLandUserAbilityLabel(record.landUserAbility)}</td>
-                    <td>${record.landSize.toFixed(2)}</td>
-                    <td>${record.isKibanjaHolder ? 'Yes' : 'No'}</td>
-                    <td>${incomeText}</td>
-                    <td><span class="status-badge ${statusClass}">${record.status}</span></td>
-                    <td>${new Date(record.timestamp).toLocaleDateString()}</td>
-                    <td>
-                        <button onclick="viewRecordDetails('${record.id}')" class="action-btn view-btn">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                    </td>
-                `;
-            });
-        }
 
-        function loadAdminRecords() {
-            const tbody = document.getElementById('adminTableBody');
-            const noData = document.getElementById('noReviewData');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-            
-            if (AppState.landUseData.length === 0) {
-                noData.style.display = 'block';
-                return;
+            static loadAllSubmissionsToAdminMap() {
+                if (!AppState.adminMap) return;
+                Object.values(AppState.adminMarkers).forEach(m => AppState.adminMap.removeLayer(m));
+                AppState.adminMarkers = {};
+
+                AppState.landUseData.forEach(record => {
+                    if (record.location) {
+                        let marker;
+                        if (record.location.type === 'area' && record.location.coordinates) {
+                            marker = L.polygon(record.location.coordinates.map(c => [c.lat, c.lng]), {
+                                color: this.getColorForStatus(record.status || 'pending'),
+                                fillColor: this.getColorForStatus(record.status || 'pending'),
+                                fillOpacity: 0.25,
+                                weight: 2
+                            }).addTo(AppState.adminMap);
+                        } else {
+                            marker = L.marker([record.location.latitude, record.location.longitude], {
+                                icon: this.getIconForStatus(record.status || 'pending')
+                            }).addTo(AppState.adminMap);
+                        }
+                        let popup = `
+                            <div style="font-size:14px;">
+                                <strong>${record.district} - ${record.subcounty}</strong><br>
+                                <strong>Collector:</strong> ${record.collectorName}<br>
+                                <strong>Land Use:</strong> ${record.landUseType}<br>
+                                <strong>Size:</strong> ${record.landSize ? record.landSize.toFixed(2) + ' acres' : 'N/A'}<br>
+                                <strong>Status:</strong> ${record.status || 'pending'}<br>
+                                <button onclick="viewRecordDetails('${record.id}')" style="margin-top:5px;padding:5px 10px;background:#007bff;color:white;border:none;border-radius:3px;cursor:pointer;font-size:12px;">
+                                    <i class="fas fa-eye"></i> Review
+                                </button>
+                            </div>
+                        `;
+                        marker.bindPopup(popup);
+                        marker.on('click', () => viewRecordDetails(record.id));
+                        AppState.adminMarkers[record.id] = marker;
+                    }
+                });
             }
-            
-            noData.style.display = 'none';
-            
-            // Sort by status (pending first) then by date
-            const records = [...AppState.landUseData].sort((a, b) => {
-                if (a.status === 'pending' && b.status !== 'pending') return -1;
-                if (a.status !== 'pending' && b.status === 'pending') return 1;
-                return new Date(b.timestamp) - new Date(a.timestamp);
-            });
-            
-            records.forEach(record => {
-                const row = tbody.insertRow();
-                const statusClass = `status-${record.status}`;
-                const incomeText = record.isKibanjaHolder && record.monthlyIncomeEstimate 
-                    ? `UGX ${record.monthlyIncomeEstimate.toLocaleString()}` 
-                    : 'N/A';
-                
-                row.innerHTML = `
-                    <td>${record.id.substring(0, 8)}...</td>
-                    <td>${record.collectorName}</td>
-                    <td>${record.district}</td>
-                    <td>${record.subcounty}</td>
-                    <td>${getLandUserAbilityLabel(record.landUserAbility)}</td>
-                    <td>${record.landSize.toFixed(2)} Ha</td>
-                    <td>${incomeText}</td>
-                    <td><span class="status-badge ${statusClass}">${record.status}</span></td>
-                    <td>${new Date(record.timestamp).toLocaleDateString()}</td>
-                    <td>
-                        <button onclick="viewRecordDetails('${record.id}')" class="action-btn view-btn" style="margin-right: 5px;">
-                            <i class="fas fa-eye"></i> View
-                        </button>
-                        ${record.status === 'pending' ? `
-                            <button onclick="quickApprove('${record.id}')" class="action-btn approve-btn" style="margin-right: 5px;">
-                                <i class="fas fa-check"></i> Approve
-                            </button>
-                            <button onclick="quickReject('${record.id}')" class="action-btn reject-btn">
-                                <i class="fas fa-times"></i> Reject
-                            </button>
-                        ` : ''}
-                    </td>
-                `;
-            });
+
+            static getIconForStatus(status) {
+                const colors = { pending: '#FFD700', approved: '#28a745', rejected: '#dc3545' };
+                const color = colors[status] || '#FFD700';
+                return L.divIcon({
+                    className: 'custom-marker',
+                    html: '<div style="background-color:' + color + ';width:15px;height:15px;border-radius:50%;border:2px solid white;box-shadow:0 0 5px rgba(0,0,0,0.5);"></div>',
+                    iconSize: [15, 15]
+                });
+            }
+
+            static getColorForStatus(status) {
+                const colors = { pending: '#FFD700', approved: '#28a745', rejected: '#dc3545' };
+                return colors[status] || '#FFD700';
+            }
         }
 
-        function getLandUserAbilityLabel(value) {
-            const labels = {
-                'subsistence': 'Subsistence',
-                'semi_commercial': 'Semi-Commercial',
-                'commercial': 'Commercial',
-                'mixed_farming': 'Mixed Farming',
-                'pastoral': 'Pastoral',
-                'aquaculture': 'Aquaculture',
-                'agroforestry': 'Agroforestry',
-                'residential': 'Residential',
-                'rental': 'Rental',
-                'business': 'Business',
-                'idle': 'Idle',
-                'other': 'Other'
-            };
-            return labels[value] || value;
+        // ===================================================================
+        // DATA MANAGER (unchanged)
+        // ===================================================================
+        class DataManager {
+            static init() {
+                this.loadSavedData();
+                this.setupFormListeners();
+                this.setupFormToggles();
+                this.setupEventListeners();
+                this.loadFieldRecords();
+                this.loadAdminRecords();
+                this.updateStatistics();
+            }
+
+            static setupFormToggles() {
+                document.getElementById('isLandTitled').addEventListener('change', function() {
+                    document.getElementById('titleSection').style.display = this.checked ? 'block' : 'none';
+                });
+
+                const ownSelect = document.getElementById('ownership');
+                const kibanjaSub = document.getElementById('kibanjaSubsection');
+                const landlordSub = document.getElementById('landlordSection');
+
+                ownSelect.addEventListener('change', function() {
+                    kibanjaSub.style.display = 'none';
+                    landlordSub.style.display = 'none';
+                    if (this.value === 'kibanja_holder') {
+                        kibanjaSub.style.display = 'block';
+                        document.getElementById('kibanjaStatus').required = true;
+                    } else if (this.value === 'landlord') {
+                        landlordSub.style.display = 'block';
+                        document.getElementById('kibanjaStatus').required = false;
+                    } else {
+                        document.getElementById('kibanjaStatus').required = false;
+                    }
+                });
+            }
+
+            static setupFormListeners() {
+                document.getElementById('landUseForm').addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    if (!AppState.selectedLocation) {
+                        alert('Please capture a polygon on the map first!');
+                        return;
+                    }
+                    if (!this.validateForm()) {
+                        alert('Please fill in all required fields correctly.');
+                        return;
+                    }
+                    const record = this.createRecord();
+                    AppState.landUseData.unshift(record);
+                    this.saveData();
+                    this.resetForm();
+                    this.loadFieldRecords();
+                    this.updateStatistics();
+                    if (AppState.adminMap) MapManager.loadAllSubmissionsToAdminMap();
+                    alert('✅ Record submitted!\n\nID: ' + record.id + '\nStatus: Pending Review');
+                });
+
+                document.getElementById('clearForm').addEventListener('click', () => this.resetForm());
+
+                document.getElementById('trackLocation').addEventListener('click', () => {
+                    const btn = document.getElementById('trackLocation');
+                    if (AppState.isTrackingLocation) {
+                        if (AppState.userLocationWatchId) {
+                            navigator.geolocation.clearWatch(AppState.userLocationWatchId);
+                            AppState.userLocationWatchId = null;
+                        }
+                        AppState.isTrackingLocation = false;
+                        btn.innerHTML = '<i class="fas fa-satellite"></i> Start Tracking';
+                        btn.classList.remove('active');
+                    } else {
+                        AppState.isTrackingLocation = true;
+                        btn.innerHTML = '<i class="fas fa-satellite"></i> Stop Tracking';
+                        btn.classList.add('active');
+                    }
+                });
+            }
+
+            static validateForm() {
+                const fields = ['collectorName', 'district', 'subcounty', 'landUseType', 'landSize', 'ownership'];
+                const ids = ['collectorNameError', 'districtError', 'subcountyError', 'landUseTypeError', 'landSizeError', 'ownershipError'];
+                this.clearValidationErrors();
+                let valid = true;
+                for (let i = 0; i < fields.length; i++) {
+                    const val = document.getElementById(fields[i]).value.trim();
+                    if (!val) {
+                        document.getElementById(ids[i]).classList.add('show');
+                        valid = false;
+                    }
+                }
+                const landSize = parseFloat(document.getElementById('landSize').value);
+                if (isNaN(landSize) || landSize <= 0) {
+                    document.getElementById('landSizeError').classList.add('show');
+                    valid = false;
+                }
+                if (document.getElementById('ownership').value === 'kibanja_holder') {
+                    const status = document.getElementById('kibanjaStatus').value;
+                    if (!status) {
+                        document.getElementById('kibanjaStatusError').classList.add('show');
+                        valid = false;
+                    }
+                }
+                return valid;
+            }
+
+            static clearValidationErrors() {
+                document.querySelectorAll('.validation-error').forEach(el => el.classList.remove('show'));
+            }
+
+            static createRecord() {
+                const isTitled = document.getElementById('isLandTitled').checked;
+                const ownership = document.getElementById('ownership').value;
+                const record = {
+                    id: 'KL-' + Date.now().toString().slice(-6) + '-' + Math.random().toString(36).substr(2, 3).toUpperCase(),
+                    timestamp: new Date().toISOString(),
+                    collectorName: document.getElementById('collectorName').value.trim(),
+                    district: document.getElementById('district').value.trim() || 'Kampala',
+                    subcounty: document.getElementById('subcounty').value.trim(),
+                    parish: document.getElementById('parish').value.trim(),
+                    location: AppState.selectedLocation,
+                    isLandTitled: isTitled,
+                    titleInfo: isTitled ? {
+                        blockNumber: document.getElementById('blockNumber').value,
+                        plotNumber: document.getElementById('plotNumber').value
+                    } : null,
+                    landSize: parseFloat(document.getElementById('landSize').value),
+                    landUseType: document.getElementById('landUseType').value,
+                    landCover: document.getElementById('landCover').value,
+                    ownership: ownership,
+                    ownershipDetails: ownership === 'kibanja_holder' ? {
+                        kibanjaStatus: document.getElementById('kibanjaStatus').value,
+                        kibanjaDetails: document.getElementById('kibanjaDetails').value
+                    } : (ownership === 'landlord' ? {
+                        landlordDetails: document.getElementById('landlordDetails').value
+                    } : null),
+                    cropType: document.getElementById('cropType').value,
+                    notes: document.getElementById('notes').value,
+                    status: 'pending',
+                    reviewedBy: null,
+                    reviewDate: null,
+                    reviewComments: null
+                };
+                return record;
+            }
+
+            static resetForm() {
+                document.getElementById('landUseForm').reset();
+                MapManager.clearCapture(true);
+                document.getElementById('selectedCoords').textContent = 'Not captured';
+                document.getElementById('areaSizeDisplay').textContent = '--';
+                document.getElementById('centerPointDisplay').textContent = '--';
+                document.getElementById('areaInfo').classList.remove('active');
+                document.getElementById('saveBtn').disabled = true;
+                document.getElementById('isLandTitled').checked = false;
+                document.getElementById('titleSection').style.display = 'none';
+                document.getElementById('kibanjaSubsection').style.display = 'none';
+                document.getElementById('landlordSection').style.display = 'none';
+                document.getElementById('locationFillStatus').textContent = 'Waiting for polygon capture...';
+                document.getElementById('locationFillStatus').className = 'location-fill-status';
+                document.getElementById('district').value = '';
+                document.getElementById('subcounty').value = '';
+                document.getElementById('parish').value = '';
+                document.getElementById('landSize').value = '';
+                this.clearValidationErrors();
+            }
+
+            static saveData() {
+                localStorage.setItem('kampalaLandUseData', JSON.stringify(AppState.landUseData));
+                localStorage.setItem('kampalaLastSaveTime', new Date().toISOString());
+            }
+
+            static loadSavedData() {
+                const saved = localStorage.getItem('kampalaLandUseData');
+                if (saved) {
+                    try { AppState.landUseData = JSON.parse(saved); } catch (e) { AppState.landUseData = []; }
+                }
+            }
+
+            static loadFieldRecords() {
+                const tbody = document.getElementById('dataTableBody');
+                const noMsg = document.getElementById('noDataMessage');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                if (AppState.landUseData.length === 0) { noMsg.style.display = 'block'; return; }
+                noMsg.style.display = 'none';
+                AppState.landUseData.forEach(record => {
+                    const row = document.createElement('tr');
+                    let statusBadge = '';
+                    if (record.status === 'pending') statusBadge = '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>';
+                    else if (record.status === 'approved') statusBadge = '<span class="status-badge status-approved"><i class="fas fa-check"></i> Approved</span>';
+                    else if (record.status === 'rejected') statusBadge = '<span class="status-badge status-rejected"><i class="fas fa-times"></i> Rejected</span>';
+                    row.innerHTML = `
+                        <td style="font-family:monospace;font-size:0.85rem;">${record.id}</td>
+                        <td>${record.district || 'Kampala'}</td>
+                        <td>${record.subcounty}</td>
+                        <td>${record.landUseType}</td>
+                        <td>${record.landSize ? record.landSize.toFixed(2) : 'N/A'}</td>
+                        <td>${record.isLandTitled ? 'Yes' : 'No'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${new Date(record.timestamp).toLocaleDateString()}</td>
+                        <td><button onclick="viewRecordDetails('${record.id}')" class="action-btn view-btn"><i class="fas fa-eye"></i> View</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            static loadAdminRecords() {
+                const tbody = document.getElementById('adminTableBody');
+                const noMsg = document.getElementById('noReviewData');
+                if (!tbody) return;
+                tbody.innerHTML = '';
+                const records = AppState.landUseData.filter(r => r.status === 'pending' || r.status === 'rejected');
+                if (records.length === 0) { noMsg.style.display = 'block'; return; }
+                noMsg.style.display = 'none';
+                records.forEach(record => {
+                    const row = document.createElement('tr');
+                    let statusBadge = '';
+                    if (record.status === 'pending') statusBadge = '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>';
+                    else if (record.status === 'rejected') statusBadge = '<span class="status-badge status-rejected"><i class="fas fa-times"></i> Rejected</span>';
+                    row.innerHTML = `
+                        <td style="font-family:monospace;font-size:0.85rem;">${record.id}</td>
+                        <td>${record.collectorName}</td>
+                        <td>${record.district || 'Kampala'}</td>
+                        <td>${record.subcounty}</td>
+                        <td>${record.landUseType}</td>
+                        <td>${record.landSize ? record.landSize.toFixed(2) : 'N/A'}</td>
+                        <td>${record.isLandTitled ? 'Yes' : 'No'}</td>
+                        <td>${statusBadge}</td>
+                        <td>${new Date(record.timestamp).toLocaleDateString()}</td>
+                        <td><button onclick="viewRecordDetails('${record.id}')" class="action-btn view-btn"><i class="fas fa-eye"></i> Review</button></td>
+                    `;
+                    tbody.appendChild(row);
+                });
+            }
+
+            static updateStatistics() {
+                const d = AppState.landUseData;
+                document.getElementById('totalRecords').textContent = d.length;
+                document.getElementById('pendingCount').textContent = d.filter(r => r.status === 'pending').length;
+                document.getElementById('approvedCount').textContent = d.filter(r => r.status === 'approved').length;
+                document.getElementById('rejectedCount').textContent = d.filter(r => r.status === 'rejected').length;
+                document.getElementById('kibanjaHolders').textContent = d.filter(r => r.ownership === 'kibanja_holder').length;
+                document.getElementById('landlords').textContent = d.filter(r => r.ownership === 'landlord').length;
+                document.getElementById('titledCount').textContent = d.filter(r => r.isLandTitled === true).length;
+                document.getElementById('untitledCount').textContent = d.filter(r => r.isLandTitled === false).length;
+                document.getElementById('totalArea').textContent = d.reduce((s, r) => s + (r.landSize || 0), 0).toFixed(2);
+            }
+
+            static setupEventListeners() {
+                document.getElementById('fieldTab').addEventListener('click', () => this.switchDashboard('field'));
+                document.getElementById('adminTab').addEventListener('click', () => this.switchDashboard('admin'));
+
+                document.getElementById('searchMyRecords').addEventListener('input', (e) => this.filterFieldRecords(e.target.value));
+                document.getElementById('filterMyStatus').addEventListener('change', (e) => {
+                    this.filterFieldRecords(document.getElementById('searchMyRecords').value, e.target.value);
+                });
+
+                document.getElementById('adminSearch').addEventListener('input', (e) => this.filterAdminRecords(e.target.value));
+                document.getElementById('adminStatusFilter').addEventListener('change', (e) => {
+                    this.filterAdminRecords(document.getElementById('adminSearch').value, e.target.value);
+                });
+
+                document.getElementById('exportAllCSV').addEventListener('click', () => this.exportToCSV());
+                document.getElementById('exportAllJSON').addEventListener('click', () => this.exportToJSON());
+
+                window.addEventListener('online', () => {
+                    AppState.isOnline = true;
+                    document.getElementById('onlineStatus').className = 'status-dot';
+                    document.getElementById('connectionStatus').textContent = 'Online';
+                    document.getElementById('offlineNotice').classList.remove('active');
+                });
+                window.addEventListener('offline', () => {
+                    AppState.isOnline = false;
+                    document.getElementById('onlineStatus').className = 'status-dot offline';
+                    document.getElementById('connectionStatus').textContent = 'Offline';
+                    document.getElementById('offlineNotice').classList.add('active');
+                });
+            }
+
+            static switchDashboard(dashboard) {
+                const ft = document.getElementById('fieldTab');
+                const at = document.getElementById('adminTab');
+                const fd = document.getElementById('fieldDashboard');
+                const ad = document.getElementById('adminDashboard');
+                const sub = document.getElementById('dashboardSubtitle');
+                const user = document.getElementById('currentUser');
+                const role = document.getElementById('currentRole');
+
+                if (dashboard === 'field') {
+                    ft.classList.add('active');
+                    at.classList.remove('active');
+                    fd.style.display = 'block';
+                    ad.style.display = 'none';
+                    sub.textContent = 'Field Collector Dashboard';
+                    user.textContent = 'Field Collector';
+                    role.textContent = 'Active';
+                    AppState.currentRole = 'field';
+                } else {
+                    ft.classList.remove('active');
+                    at.classList.add('active');
+                    fd.style.display = 'none';
+                    ad.style.display = 'block';
+                    sub.textContent = 'Administrator Dashboard';
+                    user.textContent = 'Administrator';
+                    role.textContent = 'Reviewer';
+                    AppState.currentRole = 'admin';
+                    if (!AppState.adminMap) MapManager.initAdminMap();
+                    this.loadAdminRecords();
+                    this.updateStatistics();
+                }
+            }
+
+            static filterFieldRecords(searchTerm = '', statusFilter = '') {
+                const rows = document.querySelectorAll('#dataTableBody tr');
+                let visible = 0;
+                rows.forEach(row => {
+                    if (row.cells.length === 0) return;
+                    const district = row.cells[1].textContent.toLowerCase();
+                    const subcounty = row.cells[2].textContent.toLowerCase();
+                    const landUse = row.cells[3].textContent.toLowerCase();
+                    const id = row.cells[0].textContent.toLowerCase();
+                    const status = row.cells[6].textContent.toLowerCase();
+                    const matchSearch = !searchTerm || district.includes(searchTerm.toLowerCase()) ||
+                        subcounty.includes(searchTerm.toLowerCase()) || landUse.includes(searchTerm.toLowerCase()) ||
+                        id.includes(searchTerm.toLowerCase());
+                    const matchStatus = !statusFilter ||
+                        (statusFilter === 'pending' && status.includes('pending')) ||
+                        (statusFilter === 'approved' && status.includes('approved')) ||
+                        (statusFilter === 'rejected' && status.includes('rejected'));
+                    if (matchSearch && matchStatus) { row.style.display = ''; visible++; } else { row.style.display = 'none'; }
+                });
+                const noMsg = document.getElementById('noDataMessage');
+                if (visible === 0 && AppState.landUseData.length > 0) {
+                    noMsg.style.display = 'block';
+                    noMsg.innerHTML = '<p><i class="fas fa-search"></i> No matches.</p>';
+                } else {
+                    noMsg.style.display = 'none';
+                }
+            }
+
+            static filterAdminRecords(searchTerm = '', statusFilter = '') {
+                const rows = document.querySelectorAll('#adminTableBody tr');
+                let visible = 0;
+                rows.forEach(row => {
+                    if (row.cells.length === 0) return;
+                    const collector = row.cells[1].textContent.toLowerCase();
+                    const district = row.cells[2].textContent.toLowerCase();
+                    const subcounty = row.cells[3].textContent.toLowerCase();
+                    const landUse = row.cells[4].textContent.toLowerCase();
+                    const id = row.cells[0].textContent.toLowerCase();
+                    const status = row.cells[7].textContent.toLowerCase();
+                    const matchSearch = !searchTerm || collector.includes(searchTerm.toLowerCase()) ||
+                        district.includes(searchTerm.toLowerCase()) || subcounty.includes(searchTerm.toLowerCase()) ||
+                        landUse.includes(searchTerm.toLowerCase()) || id.includes(searchTerm.toLowerCase());
+                    const matchStatus = !statusFilter ||
+                        (statusFilter === 'pending' && status.includes('pending')) ||
+                        (statusFilter === 'approved' && status.includes('approved')) ||
+                        (statusFilter === 'rejected' && status.includes('rejected'));
+                    if (matchSearch && matchStatus) { row.style.display = ''; visible++; } else { row.style.display = 'none'; }
+                });
+                const noMsg = document.getElementById('noReviewData');
+                if (visible === 0) {
+                    noMsg.style.display = 'block';
+                    if (AppState.landUseData.filter(r => r.status === 'pending').length === 0) {
+                        noMsg.innerHTML = '<p><i class="fas fa-check-circle"></i> All reviewed.</p>';
+                    } else {
+                        noMsg.innerHTML = '<p><i class="fas fa-search"></i> No matches.</p>';
+                    }
+                } else {
+                    noMsg.style.display = 'none';
+                }
+            }
+
+            static getRecordById(id) {
+                return AppState.landUseData.find(r => r.id === id);
+            }
+
+            static updateRecordStatus(id, status, comments = '', reason = '') {
+                const rec = this.getRecordById(id);
+                if (!rec) return false;
+                rec.status = status;
+                rec.reviewedBy = 'Administrator';
+                rec.reviewDate = new Date().toISOString();
+                rec.reviewComments = comments;
+                if (status === 'rejected' && reason) rec.rejectReason = reason;
+                this.saveData();
+                this.updateStatistics();
+                MapManager.loadAllSubmissionsToAdminMap();
+                this.loadFieldRecords();
+                this.loadAdminRecords();
+                return true;
+            }
+
+            static exportToCSV() {
+                if (AppState.landUseData.length === 0) { alert('No data'); return; }
+                let csv = 'ID,Timestamp,Collector,District,Subcounty,Parish,Latitude,Longitude,Titled,Block,Plot,Land Use,Land Cover,Ownership,Kibanja Status,Kibanja Details,Landlord Details,Crop Type,Land Size (Acres),Notes,Status,Reviewed By,Review Date,Review Comments,Reject Reason\n';
+                AppState.landUseData.forEach(r => {
+                    const od = r.ownershipDetails || {};
+                    const ks = r.ownership === 'kibanja_holder' ? (od.kibanjaStatus || '') : '';
+                    const kd = r.ownership === 'kibanja_holder' ? (od.kibanjaDetails || '') : '';
+                    const ld = r.ownership === 'landlord' ? (od.landlordDetails || '') : '';
+                    csv +=
+                        `"${r.id}","${r.timestamp}","${r.collectorName}","${r.district||'Kampala'}","${r.subcounty}","${r.parish||''}",${r.location?.latitude||''},${r.location?.longitude||''},"${r.isLandTitled?'Yes':'No'}","${r.titleInfo?.blockNumber||''}","${r.titleInfo?.plotNumber||''}","${r.landUseType}","${r.landCover||''}","${r.ownership||''}","${ks}","${kd.replace(/"/g,'""')}","${ld.replace(/"/g,'""')}","${r.cropType||''}",${r.landSize||0},"${(r.notes||'').replace(/"/g,'""')}","${r.status||''}","${r.reviewedBy||''}","${r.reviewDate||''}","${(r.reviewComments||'').replace(/"/g,'""')}","${(r.rejectReason||'').replace(/"/g,'""')}"\n`;
+                });
+                const blob = new Blob([csv], { type: 'text/csv' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'kampala_land_use_data_' + new Date().toISOString().slice(0, 10) + '.csv';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
+
+            static exportToJSON() {
+                if (AppState.landUseData.length === 0) { alert('No data'); return; }
+                const dataStr = JSON.stringify(AppState.landUseData, null, 2);
+                const blob = new Blob([dataStr], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'kampala_land_use_data_' + new Date().toISOString().slice(0, 10) + '.json';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }
         }
 
-        // ==================== ADMIN ACTION FUNCTIONS ====================
-        window.viewRecordDetails = function(recordId) {
-            const record = AppState.landUseData.find(r => r.id === recordId);
-            if (!record) return;
-            
+        // ===================================================================
+        // GLOBAL FUNCTIONS (unchanged)
+        // ===================================================================
+        function viewRecordDetails(recordId) {
             AppState.currentRecordId = recordId;
-            
-            const incomeHtml = record.isKibanjaHolder && record.monthlyIncomeEstimate 
-                ? `<div class="detail-item" style="background: #d1ecf1;">
-                    <strong>Monthly Income:</strong> UGX ${record.monthlyIncomeEstimate.toLocaleString()}
-                   </div>`
-                : '';
-            
-            const content = `
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                    <div class="detail-item"><strong>ID:</strong> ${record.id}</div>
-                    <div class="detail-item"><strong>Collector:</strong> ${record.collectorName}</div>
-                    <div class="detail-item"><strong>District:</strong> ${record.district}</div>
-                    <div class="detail-item"><strong>Subcounty:</strong> ${record.subcounty}</div>
-                    <div class="detail-item"><strong>Parish:</strong> ${record.parish || 'N/A'}</div>
-                    <div class="detail-item"><strong>Land Size:</strong> ${record.landSize} Ha</div>
-                    <div class="detail-item"><strong>Land Use:</strong> ${getLandUserAbilityLabel(record.landUserAbility)}</div>
-                    <div class="detail-item"><strong>Land Cover:</strong> ${record.landCover || 'N/A'}</div>
-                    <div class="detail-item"><strong>Crop Type:</strong> ${record.cropType || 'N/A'}</div>
-                    <div class="detail-item"><strong>Kibanja Holder:</strong> ${record.isKibanjaHolder ? 'Yes' : 'No'}</div>
-                    ${incomeHtml}
-                    <div class="detail-item"><strong>Status:</strong> <span class="status-badge status-${record.status}">${record.status}</span></div>
-                    <div class="detail-item"><strong>Submitted:</strong> ${new Date(record.timestamp).toLocaleString()}</div>
+            const record = DataManager.getRecordById(recordId);
+            if (!record) return;
+
+            const modal = document.getElementById('recordDetailsModal');
+            const content = document.getElementById('recordDetailsContent');
+            const adminActions = document.getElementById('adminReviewActions');
+            const modalTitle = document.getElementById('modalTitle');
+            const rejectSection = document.getElementById('rejectSection');
+            rejectSection.style.display = 'none';
+
+            let ownerHTML = '';
+            if (record.ownership === 'kibanja_holder' && record.ownershipDetails) {
+                ownerHTML = `
+                    <div style="background:#fff3e0;padding:10px;border-radius:5px;margin-top:10px;">
+                        <p><strong>Kibanja Status:</strong> ${record.ownershipDetails.kibanjaStatus ? record.ownershipDetails.kibanjaStatus.replace(/_/g,' ') : 'N/A'}</p>
+                        ${record.ownershipDetails.kibanjaDetails ? `<p><strong>Details:</strong> ${record.ownershipDetails.kibanjaDetails}</p>` : ''}
+                    </div>
+                `;
+            } else if (record.ownership === 'landlord' && record.ownershipDetails) {
+                ownerHTML = `
+                    <div style="background:#e3f2fd;padding:10px;border-radius:5px;margin-top:10px;">
+                        ${record.ownershipDetails.landlordDetails ? `<p><strong>Landlord:</strong> ${record.ownershipDetails.landlordDetails}</p>` : '<p>No landlord details.</p>'}
+                    </div>
+                `;
+            }
+
+            let details = `
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:15px;margin-bottom:20px;">
+                    <div>
+                        <h3><i class="fas fa-map-marker-alt"></i> Location</h3>
+                        <p><strong>ID:</strong> <code>${record.id}</code></p>
+                        <p><strong>Collector:</strong> ${record.collectorName}</p>
+                        <p><strong>District:</strong> ${record.district || 'Kampala'}</p>
+                        <p><strong>Subcounty:</strong> ${record.subcounty}</p>
+                        <p><strong>Parish:</strong> ${record.parish || 'N/A'}</p>
+                        <p><strong>Coords:</strong> ${record.location ? (record.location.latitude?.toFixed(6)||'--') + ', ' + (record.location.longitude?.toFixed(6)||'--') : 'N/A'}</p>
+                        <p><strong>Date:</strong> ${new Date(record.timestamp).toLocaleString()}</p>
+                    </div>
+                    <div>
+                        <h3><i class="fas fa-landmark"></i> Land Info</h3>
+                        <p><strong>Titled:</strong> ${record.isLandTitled ? 'Yes' : 'No'}</p>
+                        ${record.isLandTitled && record.titleInfo ? `
+                            <div style="background:#f0f8ff;padding:10px;border-radius:5px;margin-top:10px;">
+                                <p><strong>Block:</strong> ${record.titleInfo.blockNumber || 'N/A'}</p>
+                                <p><strong>Plot:</strong> ${record.titleInfo.plotNumber || 'N/A'}</p>
+                            </div>
+                        ` : ''}
+                        <p><strong>Land Use:</strong> ${record.landUseType}</p>
+                        <p><strong>Cover:</strong> ${record.landCover || 'N/A'}</p>
+                        <p><strong>Ownership:</strong> ${record.ownership === 'kibanja_holder' ? 'Kibanja Holder' : (record.ownership === 'landlord' ? 'Landlord' : 'N/A')}</p>
+                        ${ownerHTML}
+                        <p><strong>Size:</strong> ${record.landSize ? record.landSize.toFixed(2) + ' acres' : 'N/A'}</p>
+                        ${record.cropType ? `<p><strong>Crop:</strong> ${record.cropType}</p>` : ''}
+                    </div>
                 </div>
-                ${record.notes ? `<div class="detail-item" style="margin-top: 15px;"><strong>Notes:</strong> ${record.notes}</div>` : ''}
-                ${record.reviewComments ? `<div class="detail-item" style="margin-top: 15px;"><strong>Review Comments:</strong> ${record.reviewComments}</div>` : ''}
+                ${record.notes ? `
+                <div style="background:#f8f9fa;padding:15px;border-radius:8px;margin-bottom:15px;">
+                    <h3><i class="fas fa-sticky-note"></i> Notes</h3>
+                    <p>${record.notes}</p>
+                </div>
+                ` : ''}
+                <div style="background:#f8f9fa;padding:15px;border-radius:8px;">
+                    <h3><i class="fas fa-info-circle"></i> Review Status</h3>
+                    <p><strong>Status:</strong> 
+                        ${record.status === 'pending' ? '<span class="status-badge status-pending"><i class="fas fa-clock"></i> Pending</span>' :
+                          record.status === 'approved' ? '<span class="status-badge status-approved"><i class="fas fa-check"></i> Approved</span>' :
+                          '<span class="status-badge status-rejected"><i class="fas fa-times"></i> Rejected</span>'}
+                    </p>
+                    ${record.reviewedBy ? `
+                        <p><strong>Reviewed by:</strong> ${record.reviewedBy}</p>
+                        <p><strong>Review Date:</strong> ${new Date(record.reviewDate).toLocaleString()}</p>
+                        ${record.reviewComments ? `<p><strong>Comments:</strong> ${record.reviewComments}</p>` : ''}
+                        ${record.rejectReason ? `<p><strong>Rejection Reason:</strong> ${record.rejectReason}</p>` : ''}
+                    ` : ''}
+                </div>
             `;
-            
-            document.getElementById('recordDetailsContent').innerHTML = content;
-            document.getElementById('modalTitle').textContent = `Record Details: ${record.id}`;
-            
-            // Show/hide review actions based on status
-            const reviewActions = document.getElementById('adminReviewActions');
-            if (reviewActions) {
-                reviewActions.style.display = record.status === 'pending' ? 'block' : 'none';
+
+            content.innerHTML = details;
+            modalTitle.textContent = 'Record Details: ' + record.id;
+
+            if (AppState.currentRole === 'admin' && record.status === 'pending') {
+                adminActions.style.display = 'block';
+                document.getElementById('reviewComments').value = '';
+            } else {
+                adminActions.style.display = 'none';
             }
-            
-            document.getElementById('recordDetailsModal').style.display = 'block';
-        };
 
-        window.quickApprove = function(recordId) {
-            if (confirm('Approve this record?')) {
-                const record = AppState.landUseData.find(r => r.id === recordId);
-                if (record) {
-                    record.status = 'approved';
-                    record.reviewedBy = 'Administrator';
-                    record.reviewComments = 'Approved via quick action';
-                    record.reviewDate = new Date().toISOString();
-                    saveData();
-                    refreshAllTables();
-                    alert('✅ Record approved successfully!');
-                }
-            }
-        };
+            modal.style.display = 'block';
+        }
 
-        window.quickReject = function(recordId) {
-            const reason = prompt('Please enter reason for rejection:');
-            if (reason !== null) {
-                if (reason.trim() === '') {
-                    alert('Rejection reason is required');
-                    return;
-                }
-                
-                const record = AppState.landUseData.find(r => r.id === recordId);
-                if (record) {
-                    record.status = 'rejected';
-                    record.reviewedBy = 'Administrator';
-                    record.reviewComments = 'Rejection Reason: ' + reason;
-                    record.reviewDate = new Date().toISOString();
-                    saveData();
-                    refreshAllTables();
-                    alert('❌ Record rejected successfully!');
-                }
-            }
-        };
-
-        window.approveCurrentRecord = function() {
-            if (!AppState.currentRecordId) return;
-            
-            const record = AppState.landUseData.find(r => r.id === AppState.currentRecordId);
-            if (record) {
-                record.status = 'approved';
-                record.reviewedBy = 'Administrator';
-                record.reviewComments = document.getElementById('reviewComments').value.trim() || null;
-                record.reviewDate = new Date().toISOString();
-                saveData();
-                refreshAllTables();
-                closeModal();
-                alert('✅ Record approved successfully!');
-            }
-        };
-
-        window.rejectCurrentRecord = function() {
-            if (!AppState.currentRecordId) return;
-            
-            const reason = document.getElementById('rejectReason').value.trim();
-            if (!reason) {
-                alert('Please provide a reason for rejection');
-                return;
-            }
-            
-            const record = AppState.landUseData.find(r => r.id === AppState.currentRecordId);
-            if (record) {
-                const comments = document.getElementById('reviewComments').value.trim();
-                record.status = 'rejected';
-                record.reviewedBy = 'Administrator';
-                record.reviewComments = (comments ? comments + '\n\n' : '') + 'Rejection Reason: ' + reason;
-                record.reviewDate = new Date().toISOString();
-                saveData();
-                refreshAllTables();
-                closeModal();
-                alert('❌ Record rejected successfully!');
-            }
-        };
-
-        window.showRejectForm = function() {
-            document.getElementById('rejectForm').style.display = 'block';
-        };
-
-        window.hideRejectForm = function() {
-            document.getElementById('rejectForm').style.display = 'none';
-            document.getElementById('rejectReason').value = '';
-        };
-
-        window.closeModal = function() {
+        function closeRecordDetails() {
             document.getElementById('recordDetailsModal').style.display = 'none';
             AppState.currentRecordId = null;
-            hideRejectForm();
-            document.getElementById('reviewComments').value = '';
-        };
-
-        // ==================== EVENT LISTENERS ====================
-        function setupEventListeners() {
-            // Tab switching
-            document.getElementById('fieldTab').addEventListener('click', function() {
-                document.getElementById('fieldTab').classList.add('active');
-                document.getElementById('adminTab').classList.remove('active');
-                document.getElementById('fieldDashboard').style.display = 'block';
-                document.getElementById('adminDashboard').style.display = 'none';
-                document.getElementById('dashboardSubtitle').textContent = 'Field Collector Dashboard';
-            });
-            
-            document.getElementById('adminTab').addEventListener('click', function() {
-                document.getElementById('fieldTab').classList.remove('active');
-                document.getElementById('adminTab').classList.add('active');
-                document.getElementById('fieldDashboard').style.display = 'none';
-                document.getElementById('adminDashboard').style.display = 'block';
-                document.getElementById('dashboardSubtitle').textContent = 'Administrator Dashboard';
-                
-                initializeAdminMap();
-                loadAdminRecords();
-            });
-            
-            // Mode buttons
-            document.getElementById('pinpointModeBtn').addEventListener('click', activatePinpointMode);
-            document.getElementById('areaModeBtn').addEventListener('click', activateAreaMode);
-            
-            // Tracking button
-            document.getElementById('trackLocation').addEventListener('click', function() {
-                AppState.isTrackingLocation = !AppState.isTrackingLocation;
-                this.innerHTML = AppState.isTrackingLocation 
-                    ? '<i class="fas fa-satellite"></i> Stop Tracking'
-                    : '<i class="fas fa-satellite"></i> Start Tracking';
-                this.classList.toggle('active');
-            });
-            
-            // Search and filter
-            document.getElementById('searchMyRecords').addEventListener('input', filterFieldRecords);
-            document.getElementById('filterMyStatus').addEventListener('change', filterFieldRecords);
-            document.getElementById('searchReviewRecords').addEventListener('input', filterAdminRecords);
-            document.getElementById('filterReviewStatus').addEventListener('change', filterAdminRecords);
-            document.getElementById('adminSearch').addEventListener('input', filterAdminRecords);
-            document.getElementById('adminStatusFilter').addEventListener('change', filterAdminRecords);
-            
-            // Export buttons
-            document.getElementById('exportAllCSV').addEventListener('click', () => exportData('csv'));
-            document.getElementById('exportAllJSON').addEventListener('click', () => exportData('json'));
-            document.getElementById('printAll').addEventListener('click', () => window.print());
-            
-            // Online/offline events
-            window.addEventListener('online', updateOnlineStatus);
-            window.addEventListener('offline', updateOnlineStatus);
-            
-            // Close modal on outside click
-            window.onclick = function(e) {
-                const modal = document.getElementById('recordDetailsModal');
-                if (e.target === modal) closeModal();
-            };
         }
 
-        function filterFieldRecords() {
-            const searchTerm = document.getElementById('searchMyRecords').value.toLowerCase();
-            const statusFilter = document.getElementById('filterMyStatus').value;
-            
-            document.querySelectorAll('#dataTableBody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                const statusCell = row.querySelector('td:nth-child(8)');
-                const status = statusCell ? statusCell.textContent.toLowerCase() : '';
-                
-                const matchesSearch = text.includes(searchTerm);
-                const matchesStatus = !statusFilter || status.includes(statusFilter);
-                
-                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
-            });
+        function showRejectSection() {
+            document.getElementById('rejectSection').style.display = 'block';
+            document.getElementById('rejectReason').focus();
         }
 
-        function filterAdminRecords() {
-            const searchTerm = document.getElementById('searchReviewRecords').value.toLowerCase() || 
-                              document.getElementById('adminSearch').value.toLowerCase();
-            const statusFilter = document.getElementById('filterReviewStatus').value || 
-                                document.getElementById('adminStatusFilter').value;
-            
-            document.querySelectorAll('#adminTableBody tr').forEach(row => {
-                const text = row.textContent.toLowerCase();
-                const statusCell = row.querySelector('td:nth-child(8)');
-                const status = statusCell ? statusCell.textContent.toLowerCase() : '';
-                
-                const matchesSearch = text.includes(searchTerm);
-                const matchesStatus = !statusFilter || status.includes(statusFilter);
-                
-                row.style.display = matchesSearch && matchesStatus ? '' : 'none';
-            });
+        function hideRejectSection() {
+            document.getElementById('rejectSection').style.display = 'none';
+            document.getElementById('rejectReason').value = '';
         }
 
-        function updateOnlineStatus() {
+        function approveRecord() {
+            if (!AppState.currentRecordId) return;
+            const comments = document.getElementById('reviewComments').value.trim();
+            if (confirm('Approve this record?')) {
+                if (DataManager.updateRecordStatus(AppState.currentRecordId, 'approved', comments)) {
+                    alert('✅ Record approved!');
+                    closeRecordDetails();
+                }
+            }
+        }
+
+        function rejectRecord() {
+            if (!AppState.currentRecordId) return;
+            const reason = document.getElementById('rejectReason').value.trim();
+            const comments = document.getElementById('reviewComments').value.trim();
+            const fullComments = comments + (comments && reason ? '\n\n' : '') + (reason ? 'Rejection Reason: ' + reason : '');
+            if (!reason) { alert('Please provide a reason for rejection'); return; }
+            if (confirm('Reject this record?')) {
+                if (DataManager.updateRecordStatus(AppState.currentRecordId, 'rejected', fullComments, reason)) {
+                    alert('❌ Record rejected.');
+                    closeRecordDetails();
+                }
+            }
+        }
+
+        // ===================================================================
+        // INITIALIZATION
+        // ===================================================================
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('collectorName').value = AppState.currentUser;
+            MapManager.initFieldMap();
+            DataManager.init();
+
             AppState.isOnline = navigator.onLine;
-            const statusDot = document.getElementById('onlineStatus');
-            const statusText = document.getElementById('connectionStatus');
+            const onlineStatus = document.getElementById('onlineStatus');
+            const connectionStatus = document.getElementById('connectionStatus');
             const offlineNotice = document.getElementById('offlineNotice');
-            
+
             if (AppState.isOnline) {
-                statusDot.className = 'status-dot';
-                statusText.textContent = 'Online';
+                onlineStatus.className = 'status-dot';
+                connectionStatus.textContent = 'Online';
                 offlineNotice.classList.remove('active');
             } else {
-                statusDot.className = 'status-dot offline';
-                statusText.textContent = 'Offline';
+                onlineStatus.className = 'status-dot offline';
+                connectionStatus.textContent = 'Offline';
                 offlineNotice.classList.add('active');
             }
-        }
+        });
 
-        // ==================== EXPORT FUNCTIONS ====================
-        function exportData(format) {
-            if (format === 'csv') {
-                const headers = ['ID', 'Collector', 'District', 'Subcounty', 'Land Use', 'Size (Ha)', 
-                               'Kibanja Holder', 'Monthly Income', 'Certificate', 'Photo Count', 'Status', 'Date'];
-                
-                const rows = AppState.landUseData.map(r => [
-                    r.id,
-                    r.collectorName,
-                    r.district,
-                    r.subcounty,
-                    getLandUserAbilityLabel(r.landUserAbility),
-                    r.landSize,
-                    r.isKibanjaHolder ? 'Yes' : 'No',
-                    r.isKibanjaHolder && r.monthlyIncomeEstimate ? `UGX ${r.monthlyIncomeEstimate}` : 'N/A',
-                    r.hasCertificate ? 'Yes' : 'No',
-                    r.photos ? r.photos.length : 0,
-                    r.status,
-                    new Date(r.timestamp).toLocaleDateString()
-                ]);
-                
-                const csv = [headers, ...rows].map(row => row.map(c => `"${c}"`).join(',')).join('\n');
-                downloadFile(csv, 'uganda_land_use_data.csv', 'text/csv');
-            } else {
-                const exportData = AppState.landUseData.map(r => {
-                    const e = {...r};
-                    if (e.photos) e.photos = e.photos.map(p => ({ name: p.name, size: p.size, type: p.type }));
-                    return e;
-                });
-                
-                downloadFile(JSON.stringify(exportData, null, 2), 'uganda_land_use_data.json', 'application/json');
-            }
-        }
-
-        function downloadFile(content, filename, type) {
-            const blob = new Blob([content], { type });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = filename;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
-        // ==================== SAMPLE DATA ====================
-        function loadSampleData() {
-            if (AppState.landUseData.length === 0) {
-                AppState.landUseData.push({
-                    id: 'REC-2024-001',
-                    collectorName: 'John Doe',
-                    district: 'Kampala',
-                    subcounty: 'Central',
-                    parish: 'Nakasero',
-                    isKibanjaHolder: true,
-                    monthlyIncomeEstimate: 650000,
-                    incomeSources: 'commercial',
-                    landSize: 0.5,
-                    landUserAbility: 'commercial',
-                    location: { latitude: 0.3136, longitude: 32.5811, type: 'pinpoint' },
-                    timestamp: new Date(Date.now() - 86400000).toISOString(),
-                    status: 'approved',
-                    reviewedBy: 'Administrator',
-                    reviewComments: 'Verified',
-                    reviewDate: new Date().toISOString()
-                });
-                
-                AppState.landUseData.push({
-                    id: 'REC-2024-002',
-                    collectorName: 'Jane Smith',
-                    district: 'Wakiso',
-                    subcounty: 'Entebbe',
-                    parish: 'Kitooro',
-                    isKibanjaHolder: false,
-                    landSize: 2.5,
-                    landUserAbility: 'subsistence',
-                    landCover: 'Cropland',
-                    cropType: 'Maize',
-                    location: { latitude: 0.0512, longitude: 32.4637, type: 'pinpoint' },
-                    timestamp: new Date(Date.now() - 172800000).toISOString(),
-                    status: 'pending'
-                });
-                
-                AppState.landUseData.push({
-                    id: 'REC-2024-003',
-                    collectorName: 'Robert Mukiibi',
-                    district: 'Mukono',
-                    subcounty: 'Nakisunga',
-                    parish: 'Kyampisi',
-                    isKibanjaHolder: true,
-                    monthlyIncomeEstimate: 320000,
-                    incomeSources: 'crops',
-                    landSize: 1.2,
-                    landUserAbility: 'mixed_farming',
-                    landCover: 'Cropland',
-                    cropType: 'Coffee, Bananas',
-                    location: { latitude: 0.4589, longitude: 32.7456, type: 'pinpoint' },
-                    timestamp: new Date(Date.now() - 259200000).toISOString(),
-                    status: 'rejected',
-                    reviewedBy: 'Administrator',
-                    reviewComments: 'Incomplete information',
-                    reviewDate: new Date().toISOString()
-                });
-                
-                saveData();
-                refreshAllTables();
-            }
-        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('recordDetailsModal');
+            if (event.target == modal) closeRecordDetails();
+        };
     </script>
 </body>
 </html>
